@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29613.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeeNetServer", "BeeNetServer\BeeNetServer.csproj", "{222FC237-14BE-4509-A8F9-1BD7B6673073}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{222FC237-14BE-4509-A8F9-1BD7B6673073}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{222FC237-14BE-4509-A8F9-1BD7B6673073}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{222FC237-14BE-4509-A8F9-1BD7B6673073}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{222FC237-14BE-4509-A8F9-1BD7B6673073}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D75DA25C-4525-40D3-82DC-57788B8AD06E}
+	EndGlobalSection
+EndGlobal
