@@ -344,4 +344,5 @@ healthchecksdb
 db.db
 db.db*
 UserSetting.json
+#wwwroot
 wwwroot/pictures
