@@ -146,6 +146,20 @@ namespace BeeNetServer.Background
             File.Copy(picture.Path, newFilePath, true);
             picture.Path = newFilePath;
         }
+
+        public static Picture ForceAddPicture(Picture picture)
+        {
+            return null;
+            if(TaskProgress.TaskProgressStatus == TaskProgressStatus.Finished)
+            {
+                var res = PictureExtensions.SingleOrDefault(p => p.Picture.Path == picture.Path);
+                //if(res)
+            }
+            else
+            {
+                //throw new Ex
+            }
+        }
     }
 
 
@@ -216,7 +230,7 @@ namespace BeeNetServer.Background
         /// 是否繁忙
         /// </summary>
         /// <returns></returns>
-        public bool IsBusy => !(TaskProgressStatus == TaskProgressStatus.Empty);
+        public bool IsBusy => !(TaskProgressStatus == TaskProgressStatus.Running);
         /// <summary>
         /// 设置进度
         /// </summary>
@@ -232,7 +246,6 @@ namespace BeeNetServer.Background
     {
         Empty = 0,
         Running,
-        Wating,
         Finished,
     }
 }

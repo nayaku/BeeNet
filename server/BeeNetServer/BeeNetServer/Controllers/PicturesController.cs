@@ -36,7 +36,7 @@ namespace BeeNetServer.Controllers
             return _supportTypes;
         }
 
-        [HttpGet("AddProgress")]
+        [HttpGet("Progress")]
         public Tuple<TaskProgressIndicator, List<PictureExtension>> GetAddProgress()
         {
             return new Tuple<TaskProgressIndicator,List<PictureExtension>>(PicturesAddProgress.TaskProgress, PicturesAddProgress.PictureExtensions );
@@ -105,7 +105,11 @@ namespace BeeNetServer.Controllers
             return new AcceptedResult();
         }
 
-         
+        [HttpPost("Force")]
+        public async Task<ActionResult<Picture>> ForceAddPicture(Picture picture)
+        {
+            return null;
+        }
 
         // DELETE: api/Pictures/5
         [HttpDelete("{id}")]
