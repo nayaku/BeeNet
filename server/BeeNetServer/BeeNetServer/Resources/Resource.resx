@@ -117,7 +117,28 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AddingPicture" xml:space="preserve">
+    <value>这在添加图片{0}。</value>
+  </data>
+  <data name="FileNotExist" xml:space="preserve">
+    <value>文件不存在！</value>
+  </data>
   <data name="HelloWorld" xml:space="preserve">
-    <value>Hello world!</value>
+    <value>您好，世界！</value>
+  </data>
+  <data name="OperateFinish" xml:space="preserve">
+    <value>操作完成。</value>
+  </data>
+  <data name="SamePictureInGallery" xml:space="preserve">
+    <value>库中已经存在相同图片。</value>
+  </data>
+  <data name="SamePictureInQueue" xml:space="preserve">
+    <value>添加队列中已经存在相同图片。</value>
+  </data>
+  <data name="SavingDatabaseChange" xml:space="preserve">
+    <value>正在保存到数据库中……</value>
+  </data>
+  <data name="SimilarPicture" xml:space="preserve">
+    <value>已经存在相似图片。</value>
   </data>
 </root>

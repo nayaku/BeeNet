@@ -117,7 +117,13 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AddingPicture" xml:space="preserve">
+    <value>Now is adding picture {0}.</value>
+  </data>
   <data name="HelloWorld" xml:space="preserve">
-    <value>您好，世界！</value>
+    <value>Hello world!</value>
+  </data>
+  <data name="SimilarPictureInQueue" xml:space="preserve">
+    <value>There are already the similar pictures in the queue.</value>
   </data>
 </root>

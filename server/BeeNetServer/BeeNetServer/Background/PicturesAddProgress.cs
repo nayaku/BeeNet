@@ -1,5 +1,6 @@
 ﻿using BeeNetServer.Data;
 using BeeNetServer.Models;
+using BeeNetServer.Resources;
 using BeeNetServer.Tool;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -48,7 +49,7 @@ namespace BeeNetServer.Background
             {
                 var pictureExtension = PictureExtensions[idx];
                 var picture = pictureExtension.Picture;
-                TaskProgress.SetProgress((float)idx / PictureExtensions.Count, $"正在添加文件{Path.GetFileName(picture.Path)}。");
+                TaskProgress.SetProgress((float)idx / PictureExtensions.Count, string.Format(Resource.AddingPicture, Path.GetFileName(picture.Path)));
                 HashUtil.ComplementPicture(picture);
                 if (File.Exists(picture.Path))
                 {
@@ -97,7 +98,7 @@ namespace BeeNetServer.Background
                                 }
                                 else
                                 {
-                                    pictureExtension.SetError("库中已经存在相似图片。", conflictPictures.ToArray());
+                                    pictureExtension.SetError(Resource.SimilarPicture, conflictPictures.ToArray());
                                 }
                             }
                             else
@@ -112,24 +113,24 @@ namespace BeeNetServer.Background
                         }
                         else
                         {
-                            pictureExtension.SetError("库中已经存在相同的图片。", new Picture[] { conflictPicture });
+                            pictureExtension.SetError(Resource.SamePictureInGallery, new Picture[] { conflictPicture });
                         }
 
                     }
                     else
                     {
-                        pictureExtension.SetError("队列中已经存在相同的图片。", new Picture[] { md5Dict[md5] });
+                        pictureExtension.SetError(Resource.SamePictureInQueue, new Picture[] { md5Dict[md5] });
                     }
                 }
                 else
                 {
-                    pictureExtension.SetError("文件不存在！");
+                    pictureExtension.SetError(Resource.FileNotExist);
                 }
 
             }
-            TaskProgress.SetProgress(1.0f, "正在保存到数据库中。");
+            TaskProgress.SetProgress(1.0f, Resource.SavingDatabaseChange);
             context.SaveChanges();
-            TaskProgress.SetProgress(1.0f, "操作完成！");
+            TaskProgress.SetProgress(1.0f, Resource.OperateFinish);
             TaskProgress.TaskProgressStatus = TaskProgressStatus.Finished;
         }
 

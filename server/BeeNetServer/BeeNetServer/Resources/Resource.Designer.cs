@@ -61,11 +61,74 @@ namespace BeeNetServer.Resources {
         }
         
         /// <summary>
-        ///   查找类似 Hello world! 的本地化字符串。
+        ///   查找类似 这在添加图片{0}。 的本地化字符串。
+        /// </summary>
+        internal static string AddingPicture {
+            get {
+                return ResourceManager.GetString("AddingPicture", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 文件不存在！ 的本地化字符串。
+        /// </summary>
+        internal static string FileNotExist {
+            get {
+                return ResourceManager.GetString("FileNotExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 您好，世界！ 的本地化字符串。
         /// </summary>
         internal static string HelloWorld {
             get {
                 return ResourceManager.GetString("HelloWorld", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 操作完成。 的本地化字符串。
+        /// </summary>
+        internal static string OperateFinish {
+            get {
+                return ResourceManager.GetString("OperateFinish", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 库中已经存在相同图片。 的本地化字符串。
+        /// </summary>
+        internal static string SamePictureInGallery {
+            get {
+                return ResourceManager.GetString("SamePictureInGallery", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 添加队列中已经存在相同图片。 的本地化字符串。
+        /// </summary>
+        internal static string SamePictureInQueue {
+            get {
+                return ResourceManager.GetString("SamePictureInQueue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 正在保存到数据库中…… 的本地化字符串。
+        /// </summary>
+        internal static string SavingDatabaseChange {
+            get {
+                return ResourceManager.GetString("SavingDatabaseChange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 已经存在相似图片。 的本地化字符串。
+        /// </summary>
+        internal static string SimilarPicture {
+            get {
+                return ResourceManager.GetString("SimilarPicture", resourceCulture);
             }
         }
     }
