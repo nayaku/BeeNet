@@ -123,8 +123,11 @@
   <data name="FileNotExist" xml:space="preserve">
     <value>文件不存在！</value>
   </data>
-  <data name="HelloWorld" xml:space="preserve">
-    <value>您好，世界！</value>
+  <data name="IllegalOperateBecausePreviousNotFinish" xml:space="preserve">
+    <value>非法操作！由于前一个操作未完成！</value>
+  </data>
+  <data name="NotFindPictureInQueue" xml:space="preserve">
+    <value>在队列中找不到指定图片，请刷新页面后重试！</value>
   </data>
   <data name="OperateFinish" xml:space="preserve">
     <value>操作完成。</value>

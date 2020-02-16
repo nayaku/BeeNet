@@ -79,11 +79,20 @@ namespace BeeNetServer.Resources {
         }
         
         /// <summary>
-        ///   查找类似 您好，世界！ 的本地化字符串。
+        ///   查找类似 非法操作！由于前一个操作未完成！ 的本地化字符串。
         /// </summary>
-        internal static string HelloWorld {
+        internal static string IllegalOperateBecausePreviousNotFinish {
             get {
-                return ResourceManager.GetString("HelloWorld", resourceCulture);
+                return ResourceManager.GetString("IllegalOperateBecausePreviousNotFinish", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 在队列中找不到指定图片，请刷新页面后重试！ 的本地化字符串。
+        /// </summary>
+        internal static string NotFindPictureInQueue {
+            get {
+                return ResourceManager.GetString("NotFindPictureInQueue", resourceCulture);
             }
         }
         

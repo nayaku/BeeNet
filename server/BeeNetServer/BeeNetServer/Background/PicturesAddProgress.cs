@@ -1,4 +1,5 @@
-﻿using BeeNetServer.Data;
+﻿using BeeNetServer.CException;
+using BeeNetServer.Data;
 using BeeNetServer.Models;
 using BeeNetServer.Resources;
 using BeeNetServer.Tool;
@@ -23,7 +24,7 @@ namespace BeeNetServer.Background
         public static void Push(List<Picture> pictures)
         {
             TaskProgress.TaskProgressStatus = TaskProgressStatus.Running;
-            TaskProgress.SetProgress(0,"准备执行。");
+            TaskProgress.SetProgress(0, "准备执行。");
             PictureExtensions = new List<PictureExtension>(pictures.Count);
             foreach (var picture in pictures)
             {
@@ -45,7 +46,7 @@ namespace BeeNetServer.Background
             using var context = scope.ServiceProvider.GetRequiredService<BeeNetContext>();
 
             Dictionary<string, Picture> md5Dict = new Dictionary<string, Picture>();
-            for(int idx=0;idx<PictureExtensions.Count;idx++)
+            for (int idx = 0; idx < PictureExtensions.Count; idx++)
             {
                 var pictureExtension = PictureExtensions[idx];
                 var picture = pictureExtension.Picture;
@@ -141,6 +142,7 @@ namespace BeeNetServer.Background
         /// <param name="md5"></param>
         private static void AddPicture(PictureExtension pictureExtension)
         {
+            pictureExtension.Succeed();
             var picture = pictureExtension.Picture;
             var newFileName = picture.MD5 + Path.GetExtension(picture.Path);
             var newFilePath = Path.Combine(UserSettingReader.UserSettings.PictureSettings.PictureStorePath, newFileName);
@@ -148,19 +150,32 @@ namespace BeeNetServer.Background
             picture.Path = newFilePath;
         }
 
-        public static Picture ForceAddPicture(Picture picture)
+        public static async Task<Picture> ForceAddPicture(Picture picture)
         {
-            return null;
-            if(TaskProgress.TaskProgressStatus == TaskProgressStatus.Finished)
+            if (TaskProgress.TaskProgressStatus == TaskProgressStatus.Finished)
             {
                 var res = PictureExtensions.SingleOrDefault(p => p.Picture.Path == picture.Path);
-                //if(res)
+                if (res != null)
+                {
+                    using var scope = Program.IHost.Services.CreateScope();
+                    var services = scope.ServiceProvider;
+                    using var context = scope.ServiceProvider.GetRequiredService<BeeNetContext>();
+                    context.Pictures.Add(res.Picture);
+                    await context.SaveChangesAsync();
+                    res.Succeed();
+                    return res.Picture;
+                }
+                else
+                {
+                    throw new SimpleException(Resource.NotFindPictureInQueue);
+                }
             }
             else
             {
-                //throw new Ex
+                throw new SimpleException(Resource.IllegalOperateBecausePreviousNotFinish);
             }
         }
+
     }
 
 
@@ -176,7 +191,7 @@ namespace BeeNetServer.Background
         public Picture[] ConflictPictures { get; set; }
 
         /// <summary>
-        /// 错误
+        /// 设置错误
         /// </summary>
         /// <param name="errorMessage"></param>
         public void SetError(string errorMessage, Picture[] conflictPictures = null)
@@ -237,7 +252,7 @@ namespace BeeNetServer.Background
         /// </summary>
         /// <param name="value"></param>
         /// <param name="text"></param>
-        public void SetProgress(float value,string text)
+        public void SetProgress(float value, string text)
         {
             CurrentValue = value;
             Information = text;

@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using BeeNetServer.Data;
 using BeeNetServer.Models;
 using BeeNetServer.Background;
+using BeeNetServer.CException;
 
 namespace BeeNetServer.Controllers
 {
@@ -108,7 +109,15 @@ namespace BeeNetServer.Controllers
         [HttpPost("Force")]
         public async Task<ActionResult<Picture>> ForceAddPicture(Picture picture)
         {
-            return null;
+            try
+            {
+                picture = await PicturesAddProgress.ForceAddPicture(picture);
+                return picture;
+            }
+            catch(SimpleException e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         // DELETE: api/Pictures/5
@@ -125,11 +134,6 @@ namespace BeeNetServer.Controllers
             await _context.SaveChangesAsync();
 
             return picture;
-        }
-
-        private bool PictureExists(uint id)
-        {
-            return _context.Pictures.Any(e => e.Id == id);
         }
     }
     
