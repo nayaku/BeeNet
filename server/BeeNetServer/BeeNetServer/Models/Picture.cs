@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BeeNetServer.Models
 {
-    public class Picture
+    public class PictureBase
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public uint Id { get; set; }
@@ -16,14 +16,17 @@ namespace BeeNetServer.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public DateTime EditTime { get; set; }
         public string Path { get; set; }
-        public string MD5 { get; set; }
-        public byte[] PriHash { get; set; }
         public int? Height { get; set; }
         public int? Weight { get; set; }
         public PictureType Type { get; set; }
 
-
         public List<PictureLabel> PictureLabels { get; set; }
+    }
+
+    public class Picture : PictureBase
+    {
+        public string MD5 { get; set; }
+        public byte[] PriHash { get; set; }
     }
     public enum PictureType
     {
