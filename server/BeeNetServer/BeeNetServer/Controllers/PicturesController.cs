@@ -26,9 +26,19 @@ namespace BeeNetServer.Controllers
 
         // GET: api/Pictures
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Picture>>> GetPictures()
+        public async Task<ActionResult<IEnumerable<PictureBase>>> GetPictures()
         {
-            return await _context.Pictures.ToListAsync();
+            return await _context.Pictures.Select(p => new PictureBase
+            {
+                Id = p.Id,
+                AddTime = p.AddTime,·
+                Height = p.Height,
+                Weight = p.Weight,
+                Type = p.Type,
+                Path = p.Path,
+                PictureLabels = p.PictureLabels
+            }).ToListAsync();
+            //return await _context.Pictures.ToListAsync();
         }
         
         [HttpGet("SupportType")]

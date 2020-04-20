@@ -1,5 +1,7 @@
 ﻿using BeeNetServer.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Debug;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,6 +42,8 @@ namespace BeeNetServer.Data
                 .Property(p => p.EditTime)
                 .HasDefaultValueSql("datetime('now')");
         }
+
+        
 
     }
 }

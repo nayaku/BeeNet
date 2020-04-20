@@ -15,6 +15,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Debug;
 using Microsoft.OData.Edm;
 using Microsoft.OpenApi.Models;
 
@@ -29,13 +30,17 @@ namespace BeeNetServer
 
         public IConfiguration Configuration { get; }
 
+        public static readonly LoggerFactory MyLoggerFactory = new LoggerFactory(new[] {
+            new DebugLoggerProvider()
+        });
+
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddOData();
             services.AddControllers();
             services.AddDbContext<BeeNetContext>(options =>
-                options.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
+                options.UseLoggerFactory(MyLoggerFactory).UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddSwaggerGen(c =>
             {
