@@ -31,7 +31,7 @@ namespace BeeNetServer.Controllers
             return await _context.Pictures.Select(p => new PictureBase
             {
                 Id = p.Id,
-                AddTime = p.AddTime,·
+                AddTime = p.AddTime,
                 Height = p.Height,
                 Weight = p.Weight,
                 Type = p.Type,
