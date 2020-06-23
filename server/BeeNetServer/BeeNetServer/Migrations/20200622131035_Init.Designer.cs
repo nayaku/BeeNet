@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BeeNetServer.Migrations
 {
     [DbContext(typeof(BeeNetContext))]
-    [Migration("20200207122727_Init")]
+    [Migration("20200622131035_Init")]
     partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -17,23 +17,6 @@ namespace BeeNetServer.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "3.1.0");
-
-            modelBuilder.Entity("BeeNetServer.Models.DatabaseInformation", b =>
-                {
-                    b.Property<uint>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Extension")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Version")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("DatabaseInformation");
-                });
 
             modelBuilder.Entity("BeeNetServer.Models.Label", b =>
                 {
@@ -48,6 +31,11 @@ namespace BeeNetServer.Migrations
 
                     b.Property<DateTime>("EditTime")
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("Num")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(0);
 
                     b.HasKey("Name");
 
@@ -70,7 +58,7 @@ namespace BeeNetServer.Migrations
                         .HasColumnType("TEXT")
                         .HasDefaultValueSql("datetime('now')");
 
-                    b.Property<int?>("Height")
+                    b.Property<int>("Height")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("MD5")
@@ -85,7 +73,7 @@ namespace BeeNetServer.Migrations
                     b.Property<int>("Type")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("Weight")
+                    b.Property<int>("Weight")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("WorkspaceName")

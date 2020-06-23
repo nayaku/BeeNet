@@ -9,6 +9,12 @@ using BeeNetServer.Data;
 using BeeNetServer.Models;
 using BeeNetServer.Background;
 using BeeNetServer.CException;
+using AutoMapper;
+using BeeNetServer.Parameters;
+using BeeNetServer.Dto;
+using BeeNetServer.Response;
+using AutoMapper.QueryableExtensions;
+using System.Linq.Dynamic.Core;
 
 namespace BeeNetServer.Controllers
 {
@@ -17,40 +23,37 @@ namespace BeeNetServer.Controllers
     public class PicturesController : ControllerBase
     {
         private readonly BeeNetContext _context;
-        private readonly string[] _supportTypes = { ".BMP", ".GIF", ".EXIF", ".JPEG", ".JPG", ".PNG", ".TIFF" };
+        private readonly IMapper _mapper;
 
-        public PicturesController(BeeNetContext context)
+        public PicturesController(BeeNetContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         // GET: api/Pictures
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<PictureBase>>> GetPictures()
+        public async Task<ActionResult<IEnumerable<PictureResponseDto>>> GetPictures([FromQuery]PictureResourceParamters paramters)
         {
-            return await _context.Pictures.Select(p => new PictureBase
+            var pictures = _context.Pictures.AsQueryable();
+            if (!string.IsNullOrWhiteSpace(paramters.SearchKey))
             {
-                Id = p.Id,
-                AddTime = p.AddTime,
-                Height = p.Height,
-                Weight = p.Weight,
-                Type = p.Type,
-                Path = p.Path,
-                PictureLabels = p.PictureLabels
-            }).ToListAsync();
-            //return await _context.Pictures.ToListAsync();
-        }
-        
-        [HttpGet("SupportType")]
-        public string[] GetSupportType()
-        {
-            return _supportTypes;
+                pictures = pictures.Where(p => p.PictureLabels.Any(pl => pl.LabelName.Contains(paramters.SearchKey)));
+            }
+            if(!string.IsNullOrWhiteSpace(paramters.OrderBy))
+            {
+                pictures = pictures.OrderBy(paramters.OrderBy);
+            }
+            pictures = pictures.Skip((paramters.PageNumber - 1) * paramters.PageNumber)
+                .Take(paramters.PageNumber);
+
+            return await pictures.ProjectTo<PictureResponseDto>(_mapper.ConfigurationProvider).ToListAsync();
         }
 
         [HttpGet("Progress")]
         public Tuple<TaskProgressIndicator, List<PictureExtension>> GetAddProgress()
         {
-            return new Tuple<TaskProgressIndicator,List<PictureExtension>>(PicturesAddProgress.TaskProgress, PicturesAddProgress.PictureExtensions );
+            return new Tuple<TaskProgressIndicator, List<PictureExtension>>(PicturesAddProgress.TaskProgress, PicturesAddProgress.PictureExtensions);
         }
 
         // GET: api/Pictures/5
@@ -103,9 +106,9 @@ namespace BeeNetServer.Controllers
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPost]
-        public async Task<ActionResult<Picture >> PostPicture(List<Picture> pictures)
+        public async Task<ActionResult<Picture>> PostPicture(List<Picture> pictures)
         {
-            if(pictures == null ||pictures.Count==0)
+            if (pictures == null || pictures.Count == 0)
             {
                 return BadRequest();
             }
@@ -124,7 +127,7 @@ namespace BeeNetServer.Controllers
                 picture = await PicturesAddProgress.ForceAddPicture(picture);
                 return picture;
             }
-            catch(SimpleException e)
+            catch (SimpleException e)
             {
                 return BadRequest(e.Message);
             }
@@ -146,5 +149,5 @@ namespace BeeNetServer.Controllers
             return picture;
         }
     }
-    
+
 }

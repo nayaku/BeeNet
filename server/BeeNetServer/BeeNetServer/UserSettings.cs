@@ -20,6 +20,10 @@ namespace BeeNetServer
             /// 相似判断阀值
             /// </summary>
             public float SimilarThreshold { get; set; } = 0.95f;
+
+            /// <summary>
+            /// 图片库的位置
+            /// </summary>
             public string PictureStorePath
             {
                 get => _pictureStorePath;
@@ -29,6 +33,7 @@ namespace BeeNetServer
                     _pictureStorePath = value;
                 }
             }
+
             private static void CreatePictureStoreDirectory(string value)
             {
                 if (!Directory.Exists(value))

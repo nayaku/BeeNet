@@ -20,7 +20,7 @@ namespace BeeNetServer
         public static void Main(string[] args)
         {
             // 初始化设置读取器
-            var k = UserSettingReader.UserSettings;
+            _ = UserSettingReader.UserSettings;
             var host = IHost = CreateHostBuilder(args).Build();
             CreateDbIfNotExists(host);
             host.Run();

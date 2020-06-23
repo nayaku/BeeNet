@@ -8,27 +8,15 @@ namespace BeeNetServer.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "DatabaseInformation",
-                columns: table => new
-                {
-                    Id = table.Column<uint>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Version = table.Column<string>(nullable: true),
-                    Extension = table.Column<string>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_DatabaseInformation", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Labels",
                 columns: table => new
                 {
                     Name = table.Column<string>(nullable: false),
                     Color = table.Column<uint>(nullable: false),
                     CreateTime = table.Column<DateTime>(nullable: false),
-                    EditTime = table.Column<DateTime>(nullable: false)
+                    EditTime = table.Column<DateTime>(nullable: false),
+                    Num = table.Column<int>(nullable: false, defaultValue: 0)
+                        .Annotation("Sqlite:Autoincrement", true)
                 },
                 constraints: table =>
                 {
@@ -57,10 +45,10 @@ namespace BeeNetServer.Migrations
                     AddTime = table.Column<DateTime>(nullable: false, defaultValueSql: "datetime('now')"),
                     EditTime = table.Column<DateTime>(nullable: false, defaultValueSql: "datetime('now')"),
                     Path = table.Column<string>(nullable: true),
+                    Height = table.Column<int>(nullable: false),
+                    Weight = table.Column<int>(nullable: false),
                     MD5 = table.Column<string>(nullable: true),
                     PriHash = table.Column<byte[]>(nullable: true),
-                    Height = table.Column<int>(nullable: true),
-                    Weight = table.Column<int>(nullable: true),
                     Type = table.Column<int>(nullable: false),
                     WorkspaceName = table.Column<string>(nullable: true)
                 },
@@ -118,9 +106,6 @@ namespace BeeNetServer.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "DatabaseInformation");
-
             migrationBuilder.DropTable(
                 name: "PictureLabels");
 

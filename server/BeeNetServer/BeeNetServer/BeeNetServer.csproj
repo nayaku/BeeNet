@@ -6,6 +6,11 @@
     <StartupObject>BeeNetServer.Program</StartupObject>
     <ApplicationIcon />
     <OutputType>WinExe</OutputType>
+    <AssemblyVersion>3.0.0.0</AssemblyVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants></DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
@@ -41,14 +46,21 @@
     <Compile Remove="Migrations\20200207114310_Init.Designer.cs" />
     <Compile Remove="Migrations\20200207121649_Init.cs" />
     <Compile Remove="Migrations\20200207121649_Init.Designer.cs" />
+    <Compile Remove="Migrations\20200207122727_Init.cs" />
+    <Compile Remove="Migrations\20200207122727_Init.Designer.cs" />
+    <Compile Remove="Migrations\20200622102006_LabelAlter_2020_6_22.cs" />
+    <Compile Remove="Migrations\20200622102006_LabelAlter_2020_6_22.Designer.cs" />
+    <Compile Remove="Migrations\20200622102408_Init.cs" />
+    <Compile Remove="Migrations\20200622102408_Init.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.OData" Version="7.4.0-Nightly202001292116" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.8">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.DynamicLinq" Version="1.1.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.0">
@@ -63,6 +75,7 @@
     <PackageReference Include="Shipwreck.Phash.PresentationCore" Version="0.5.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.0.0-rc5" />
     <PackageReference Include="System.Drawing.Common" Version="4.7.0" />
+    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.1.5" />
   </ItemGroup>
 
   <ItemGroup>

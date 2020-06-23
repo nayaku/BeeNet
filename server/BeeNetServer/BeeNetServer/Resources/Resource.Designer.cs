@@ -61,7 +61,7 @@ namespace BeeNetServer.Resources {
         }
         
         /// <summary>
-        ///   查找类似 这在添加图片{0}。 的本地化字符串。
+        ///   查找类似 正在添加图片{0}。 的本地化字符串。
         /// </summary>
         internal static string AddingPicture {
             get {

@@ -17,7 +17,13 @@ namespace BeeNetServer.Background
     /// </summary>
     public static class PicturesAddProgress
     {
+        /// <summary>
+        /// 待添加的图片列表
+        /// </summary>
         public static List<PictureExtension> PictureExtensions { get; set; }
+        /// <summary>
+        /// 进度指示器
+        /// </summary>
         public static TaskProgressIndicator TaskProgress { get; set; } = new TaskProgressIndicator();
         public static Task WorkTask { get; set; }
 
@@ -25,12 +31,12 @@ namespace BeeNetServer.Background
         {
             TaskProgress.TaskProgressStatus = TaskProgressStatus.Running;
             TaskProgress.SetProgress(0, "准备执行。");
-            PictureExtensions = new List<PictureExtension>(pictures.Count);
-            foreach (var picture in pictures)
-            {
-                picture.Type = PictureType.Normal;
-                PictureExtensions.Add(new PictureExtension { Picture = picture });
-            }
+            PictureExtensions = pictures.Select(p => new PictureExtension { Picture = p }).ToList();
+            //PictureExtensions = new List<PictureExtension>(pictures.Count);
+            //foreach (var picture in pictures)
+            //{
+            //    PictureExtensions.Add(new PictureExtension { Picture = picture });
+            //}
             WorkTask = new Task(Run, TaskCreationOptions.LongRunning);
             WorkTask.Start();
         }
@@ -178,90 +184,4 @@ namespace BeeNetServer.Background
 
     }
 
-
-    /// <summary>
-    /// 封装图片实体
-    /// </summary>
-    public class PictureExtension
-    {
-        public Picture Picture { get; set; }
-        public enum AddResultEnum { Waiting = 0, Done, Updated, DoNothing }
-        public AddResultEnum AddResult { get; set; }
-        public string ErrorMessage { get; set; }
-        public Picture[] ConflictPictures { get; set; }
-
-        /// <summary>
-        /// 设置错误
-        /// </summary>
-        /// <param name="errorMessage"></param>
-        public void SetError(string errorMessage, Picture[] conflictPictures = null)
-        {
-            SetAddResult(AddResultEnum.DoNothing, errorMessage, conflictPictures);
-        }
-
-        /// <summary>
-        /// 警告
-        /// </summary>
-        /// <param name="errorMessage"></param>
-        public void SetWarning(string errorMessage, Picture[] conflictPictures = null)
-        {
-            SetAddResult(AddResultEnum.Updated, errorMessage, conflictPictures);
-        }
-
-        /// <summary>
-        /// 成功
-        /// </summary>
-        public void Succeed()
-        {
-            SetAddResult(AddResultEnum.Done);
-        }
-
-        public void SetAddResult(AddResultEnum addResult, string errorMessage = "", Picture[] conflictPictures = null)
-        {
-            AddResult = addResult;
-            ErrorMessage = errorMessage;
-            ConflictPictures = conflictPictures;
-        }
-    }
-
-
-    /// <summary>
-    /// 进度状态指示
-    /// </summary>
-    public class TaskProgressIndicator
-    {
-        /// <summary>
-        /// 当前进度数值
-        /// </summary>
-        public float CurrentValue { get; set; }
-        /// <summary>
-        /// 步骤信息
-        /// </summary>
-        public string Information { get; set; }
-        /// <summary>
-        /// 当前步骤状态
-        /// </summary>
-        public TaskProgressStatus TaskProgressStatus { get; set; }
-        /// <summary>
-        /// 是否繁忙
-        /// </summary>
-        /// <returns></returns>
-        public bool IsBusy => !(TaskProgressStatus == TaskProgressStatus.Running);
-        /// <summary>
-        /// 设置进度
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="text"></param>
-        public void SetProgress(float value, string text)
-        {
-            CurrentValue = value;
-            Information = text;
-        }
-    }
-    public enum TaskProgressStatus
-    {
-        Empty = 0,
-        Running,
-        Finished,
-    }
 }

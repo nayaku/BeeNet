@@ -8,20 +8,17 @@ using System.Threading.Tasks;
 
 namespace BeeNetServer.Models
 {
-    public class LabelBase
+
+    public class Label
     {
+        private int _num;
         [Key]
         public string Name { get; set; }
         public uint Color { get; set; }
         public DateTime CreateTime { get; set; }
         public DateTime EditTime { get; set; }
 
-        [NotMapped]
-        public int PictureLabelNum { get; set; }
-    }
-
-    public class Label : LabelBase
-    {
+        public int Num => _num;
         public List<PictureLabel> PictureLabels { get; set; }
     }
 }

@@ -16,23 +16,6 @@ namespace BeeNetServer.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "3.1.0");
 
-            modelBuilder.Entity("BeeNetServer.Models.DatabaseInformation", b =>
-                {
-                    b.Property<uint>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Extension")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Version")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("DatabaseInformation");
-                });
-
             modelBuilder.Entity("BeeNetServer.Models.Label", b =>
                 {
                     b.Property<string>("Name")
@@ -46,6 +29,11 @@ namespace BeeNetServer.Migrations
 
                     b.Property<DateTime>("EditTime")
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("Num")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(0);
 
                     b.HasKey("Name");
 
@@ -68,7 +56,7 @@ namespace BeeNetServer.Migrations
                         .HasColumnType("TEXT")
                         .HasDefaultValueSql("datetime('now')");
 
-                    b.Property<int?>("Height")
+                    b.Property<int>("Height")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("MD5")
@@ -83,7 +71,7 @@ namespace BeeNetServer.Migrations
                     b.Property<int>("Type")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("Weight")
+                    b.Property<int>("Weight")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("WorkspaceName")

@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging.Debug;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BeeNetServer.Data
@@ -18,7 +19,6 @@ namespace BeeNetServer.Data
         public DbSet<Label> Labels { get; set; }
         public DbSet<PictureLabel> PictureLabels { get; set; }
         public DbSet<Workspace> Workspaces { get; set; }
-        public DbSet<DatabaseInformation> DatabaseInformation { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -41,6 +41,10 @@ namespace BeeNetServer.Data
             modelBuilder.Entity<Picture>()
                 .Property(p => p.EditTime)
                 .HasDefaultValueSql("datetime('now')");
+            modelBuilder.Entity<Label>()
+                .Property(l => l.Num)
+                .HasField("_num")
+                .HasDefaultValue(0);
         }
 
         
