@@ -341,3 +341,5 @@ healthchecksdb
 
 # ×Ô¶¨Òå
 *.vshistory
+client
+server
