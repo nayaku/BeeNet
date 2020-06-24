@@ -12,9 +12,9 @@ namespace BeeNetServer.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public uint Id { get; set; }
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public DateTime AddTime { get; set; }
+        public DateTime CreatedTime { get; set; }
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-        public DateTime EditTime { get; set; }
+        public DateTime ModifiedTime { get; set; }
         public string Path { get; set; }
         public int Height { get; set; }
         public int Weight { get; set; }

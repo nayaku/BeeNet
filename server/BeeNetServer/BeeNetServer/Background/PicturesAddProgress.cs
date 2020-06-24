@@ -25,7 +25,10 @@ namespace BeeNetServer.Background
         /// 进度指示器
         /// </summary>
         public static TaskProgressIndicator TaskProgress { get; set; } = new TaskProgressIndicator();
-        public static Task WorkTask { get; set; }
+        /// <summary>
+        /// 工作任务
+        /// </summary>
+        private static Task _workTask = null;
 
         public static void Push(List<Picture> pictures)
         {
@@ -37,8 +40,8 @@ namespace BeeNetServer.Background
             //{
             //    PictureExtensions.Add(new PictureExtension { Picture = picture });
             //}
-            WorkTask = new Task(Run, TaskCreationOptions.LongRunning);
-            WorkTask.Start();
+            _workTask = new Task(Run, TaskCreationOptions.LongRunning);
+            _workTask.Start();
         }
 
         /// <summary>
@@ -105,7 +108,7 @@ namespace BeeNetServer.Background
                                 }
                                 else
                                 {
-                                    pictureExtension.SetError(Resource.SimilarPicture, conflictPictures.ToArray());
+                                    pictureExtension.SetError(Resource.SimilarPicture, conflictPictures);
                                 }
                             }
                             else
@@ -120,13 +123,13 @@ namespace BeeNetServer.Background
                         }
                         else
                         {
-                            pictureExtension.SetError(Resource.SamePictureInGallery, new Picture[] { conflictPicture });
+                            pictureExtension.SetError(Resource.SamePictureInGallery, new List<Picture> { conflictPicture });
                         }
 
                     }
                     else
                     {
-                        pictureExtension.SetError(Resource.SamePictureInQueue, new Picture[] { md5Dict[md5] });
+                        pictureExtension.SetError(Resource.SamePictureInQueue, new List<Picture> { md5Dict[md5] });
                     }
                 }
                 else

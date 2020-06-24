@@ -35,30 +35,24 @@ namespace BeeNetServer.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PictureResponseDto>>> GetPictures([FromQuery]PictureResourceParamters paramters)
         {
-            var pictures = _context.Pictures.AsQueryable();
+            var picturesQuery = _context.Pictures.AsQueryable();
             if (!string.IsNullOrWhiteSpace(paramters.SearchKey))
             {
-                pictures = pictures.Where(p => p.PictureLabels.Any(pl => pl.LabelName.Contains(paramters.SearchKey)));
+                picturesQuery = picturesQuery.Where(p => p.PictureLabels.Any(pl => pl.LabelName.Contains(paramters.SearchKey)));
             }
             if(!string.IsNullOrWhiteSpace(paramters.OrderBy))
             {
-                pictures = pictures.OrderBy(paramters.OrderBy);
+                picturesQuery = picturesQuery.OrderBy(paramters.OrderBy);
             }
-            pictures = pictures.Skip((paramters.PageNumber - 1) * paramters.PageNumber)
+            picturesQuery = picturesQuery.Skip((paramters.PageNumber - 1) * paramters.PageNumber)
                 .Take(paramters.PageNumber);
 
-            return await pictures.ProjectTo<PictureResponseDto>(_mapper.ConfigurationProvider).ToListAsync();
-        }
-
-        [HttpGet("Progress")]
-        public Tuple<TaskProgressIndicator, List<PictureExtension>> GetAddProgress()
-        {
-            return new Tuple<TaskProgressIndicator, List<PictureExtension>>(PicturesAddProgress.TaskProgress, PicturesAddProgress.PictureExtensions);
+            return await picturesQuery.ProjectTo<PictureResponseDto>(_mapper.ConfigurationProvider).ToListAsync();
         }
 
         // GET: api/Pictures/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Picture>> GetPicture(uint id)
+        public async Task<ActionResult<PictureResponseDto>> GetPicture(uint id)
         {
             var picture = await _context.Pictures.FindAsync(id);
 
@@ -66,8 +60,8 @@ namespace BeeNetServer.Controllers
             {
                 return NotFound();
             }
-
-            return picture;
+            var pictureDto =  _mapper.Map<PictureResponseDto>(picture);
+            return pictureDto;
         }
 
         //// PUT: api/Pictures/5
@@ -119,23 +113,9 @@ namespace BeeNetServer.Controllers
             return new AcceptedResult();
         }
 
-        [HttpPost("Force")]
-        public async Task<ActionResult<Picture>> ForceAddPicture(Picture picture)
-        {
-            try
-            {
-                picture = await PicturesAddProgress.ForceAddPicture(picture);
-                return picture;
-            }
-            catch (SimpleException e)
-            {
-                return BadRequest(e.Message);
-            }
-        }
-
         // DELETE: api/Pictures/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Picture>> DeletePicture(uint id)
+        public async Task<ActionResult> DeletePicture(uint id)
         {
             var picture = await _context.Pictures.FindAsync(id);
             if (picture == null)
@@ -146,7 +126,7 @@ namespace BeeNetServer.Controllers
             _context.Pictures.Remove(picture);
             await _context.SaveChangesAsync();
 
-            return picture;
+            return Ok();
         }
     }
 

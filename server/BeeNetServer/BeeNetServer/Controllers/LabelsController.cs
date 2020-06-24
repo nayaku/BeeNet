@@ -7,6 +7,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BeeNetServer.Data;
 using BeeNetServer.Models;
+using BeeNetServer.Parameters;
+using System.Linq.Dynamic.Core;
+using BeeNetServer.Dto;
+using AutoMapper;
 
 namespace BeeNetServer.Controllers
 {
@@ -15,24 +19,34 @@ namespace BeeNetServer.Controllers
     public class LabelsController : ControllerBase
     {
         private readonly BeeNetContext _context;
+        private readonly IMapper _mapper;
 
-        public LabelsController(BeeNetContext context)
+        public LabelsController(BeeNetContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         // GET: api/Labels
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Label>>> GetLabels()
+        public async Task<ActionResult<IEnumerable<Label>>> GetLabels([FromQuery]LabelsResourceParamters paramters)
         {
-            return await _context.Labels.ToListAsync();
+            var labelsQuery = _context.Labels.AsQueryable();
+            if(!string.IsNullOrWhiteSpace(paramters.SearchKey))
+            {
+                labelsQuery.Where(l => l.Name.Contains(paramters.SearchKey));
+            }
+            labelsQuery.OrderBy(paramters.OrderBy);
+            labelsQuery.Skip((paramters.PageNumber - 1) * paramters.PageSize)
+                .Take(paramters.PageSize);
+            return await labelsQuery.ToListAsync();
         }
 
         // GET: api/Labels/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Label>> GetLabel(string id)
+        public async Task<ActionResult<Label>> GetLabel(string name)
         {
-            var label = await _context.Labels.FindAsync(id);
+            var label = await _context.Labels.FindAsync(name);
 
             if (label == null)
             {
@@ -42,18 +56,13 @@ namespace BeeNetServer.Controllers
             return label;
         }
 
-        // PUT: api/Labels/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
-        // more details see https://aka.ms/RazorPagesCRUD.
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutLabel(string id, Label label)
-        {
-            if (id != label.Name)
-            {
-                return BadRequest();
-            }
-
+        [HttpPut]
+        public async Task<ActionResult<Label>> PutLabel(LabelDto labelDto)
+        {               
+            var label = _mapper.Map<Label>(labelDto);
+            label.ModifiedTime = DateTime.Now;
             _context.Entry(label).State = EntityState.Modified;
+            _context.Entry(label).Property(l => l.CreatedTime).IsModified = false;
 
             try
             {
@@ -61,7 +70,7 @@ namespace BeeNetServer.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!LabelExists(id))
+                if (!LabelExists(label.Name))
                 {
                     return NotFound();
                 }
@@ -70,16 +79,13 @@ namespace BeeNetServer.Controllers
                     throw;
                 }
             }
-
-            return NoContent();
+            return CreatedAtAction("GetLabel", new { id = label.Name }, label);
         }
 
-        // POST: api/Labels
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
-        // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPost]
-        public async Task<ActionResult<Label>> PostLabel(Label label)
+        public async Task<ActionResult<Label>> PostLabel(LabelDto labelDto)
         {
+            var label = _mapper.Map<Label>(labelDto);
             _context.Labels.Add(label);
             try
             {
@@ -102,9 +108,9 @@ namespace BeeNetServer.Controllers
 
         // DELETE: api/Labels/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Label>> DeleteLabel(string id)
+        public async Task<ActionResult> DeleteLabel(string name)
         {
-            var label = await _context.Labels.FindAsync(id);
+            var label = await _context.Labels.FindAsync(name);
             if (label == null)
             {
                 return NotFound();
@@ -113,12 +119,12 @@ namespace BeeNetServer.Controllers
             _context.Labels.Remove(label);
             await _context.SaveChangesAsync();
 
-            return label;
+            return Ok();
         }
 
-        private bool LabelExists(string id)
+        private bool LabelExists(string name)
         {
-            return _context.Labels.Any(e => e.Name == id);
+            return _context.Labels.Any(e => e.Name == name);
         }
     }
 }

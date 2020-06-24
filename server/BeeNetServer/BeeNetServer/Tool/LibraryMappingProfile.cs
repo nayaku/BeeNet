@@ -16,9 +16,9 @@ namespace BeeNetServer.Tool
                     {
                         LabelName = r.Label.Name,
                         Color = r.Label.Color,
-                        Num = r.Label.Num 
-                    }).ToList()
-                    ));
+                        Num = r.Label.Num
+                    }).ToList()));
+            CreateMap<LabelDto, Label>();
         }
     }
 }

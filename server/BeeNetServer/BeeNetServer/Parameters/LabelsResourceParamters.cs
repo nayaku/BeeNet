@@ -5,13 +5,11 @@ using System.Threading.Tasks;
 
 namespace BeeNetServer.Parameters
 {
-
-    public class PictureResourceParamters : ResourceParamters
+    public class LabelsResourceParamters:ResourceParamters
     {
-        public PictureResourceParamters()
+        public LabelsResourceParamters()
         {
-            OrderBy = "CreatedTime desc";
+            OrderBy = "Num desc";
         }
-
     }
 }

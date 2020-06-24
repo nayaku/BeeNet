@@ -24,11 +24,15 @@ namespace BeeNetServer.Migrations
                     b.Property<uint>("Color")
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime>("CreateTime")
-                        .HasColumnType("TEXT");
+                    b.Property<DateTime>("CreatedTime")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT")
+                        .HasDefaultValueSql("datetime('now','localtime')");
 
-                    b.Property<DateTime>("EditTime")
-                        .HasColumnType("TEXT");
+                    b.Property<DateTime>("ModifiedTime")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT")
+                        .HasDefaultValueSql("datetime('now','localtime')");
 
                     b.Property<int>("Num")
                         .ValueGeneratedOnAdd()
@@ -46,21 +50,21 @@ namespace BeeNetServer.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime>("AddTime")
+                    b.Property<DateTime>("CreatedTime")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT")
-                        .HasDefaultValueSql("datetime('now')");
-
-                    b.Property<DateTime>("EditTime")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("TEXT")
-                        .HasDefaultValueSql("datetime('now')");
+                        .HasDefaultValueSql("datetime('now','localtime')");
 
                     b.Property<int>("Height")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("MD5")
                         .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("ModifiedTime")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("TEXT")
+                        .HasDefaultValueSql("datetime('now','localtime')");
 
                     b.Property<string>("Path")
                         .HasColumnType("TEXT");
@@ -128,7 +132,7 @@ namespace BeeNetServer.Migrations
             modelBuilder.Entity("BeeNetServer.Models.PictureLabel", b =>
                 {
                     b.HasOne("BeeNetServer.Models.Label", "Label")
-                        .WithMany("PictureLabels")
+                        .WithMany()
                         .HasForeignKey("LabelName")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

@@ -47,7 +47,12 @@ namespace BeeNetServer
                 CreatePictureStoreDirectory(_pictureStorePath);
             }
         }
+        public class CRequestSettings
+        {
+            public int PageNum { get; set; } = 20;
+        }
         public CPictureSettings PictureSettings { get; set; } = new CPictureSettings();
+        public CRequestSettings RequestSettings { get; set; } = new CRequestSettings();
     }
 
     public static class UserSettingReader

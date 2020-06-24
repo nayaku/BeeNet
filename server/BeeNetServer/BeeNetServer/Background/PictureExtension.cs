@@ -21,7 +21,7 @@ namespace BeeNetServer.Background
         /// 设置错误
         /// </summary>
         /// <param name="errorMessage"></param>
-        public void SetError(string errorMessage, Picture[] conflictPictures = null)
+        public void SetError(string errorMessage, List<Picture> conflictPictures = null)
         {
             SetAddResult(AddResultEnum.DoNothing, errorMessage, conflictPictures);
         }
@@ -30,7 +30,7 @@ namespace BeeNetServer.Background
         /// 警告
         /// </summary>
         /// <param name="errorMessage"></param>
-        public void SetWarning(string errorMessage, Picture[] conflictPictures = null)
+        public void SetWarning(string errorMessage, List<Picture> conflictPictures = null)
         {
             SetAddResult(AddResultEnum.Updated, errorMessage, conflictPictures);
         }
@@ -43,7 +43,7 @@ namespace BeeNetServer.Background
             SetAddResult(AddResultEnum.Done);
         }
 
-        public void SetAddResult(AddResultEnum addResult, string errorMessage = "", Picture[] conflictPictures = null)
+        public void SetAddResult(AddResultEnum addResult, string errorMessage = "", List<Picture> conflictPictures = null)
         {
             AddResult = addResult;
             ErrorMessage = errorMessage;

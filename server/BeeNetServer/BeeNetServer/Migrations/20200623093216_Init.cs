@@ -13,8 +13,8 @@ namespace BeeNetServer.Migrations
                 {
                     Name = table.Column<string>(nullable: false),
                     Color = table.Column<uint>(nullable: false),
-                    CreateTime = table.Column<DateTime>(nullable: false),
-                    EditTime = table.Column<DateTime>(nullable: false),
+                    CreatedTime = table.Column<DateTime>(nullable: false, defaultValueSql: "datetime('now','localtime')"),
+                    ModifiedTime = table.Column<DateTime>(nullable: false, defaultValueSql: "datetime('now','localtime')"),
                     Num = table.Column<int>(nullable: false, defaultValue: 0)
                         .Annotation("Sqlite:Autoincrement", true)
                 },
@@ -42,8 +42,8 @@ namespace BeeNetServer.Migrations
                 {
                     Id = table.Column<uint>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    AddTime = table.Column<DateTime>(nullable: false, defaultValueSql: "datetime('now')"),
-                    EditTime = table.Column<DateTime>(nullable: false, defaultValueSql: "datetime('now')"),
+                    CreatedTime = table.Column<DateTime>(nullable: false, defaultValueSql: "datetime('now','localtime')"),
+                    ModifiedTime = table.Column<DateTime>(nullable: false, defaultValueSql: "datetime('now','localtime')"),
                     Path = table.Column<string>(nullable: true),
                     Height = table.Column<int>(nullable: false),
                     Weight = table.Column<int>(nullable: false),

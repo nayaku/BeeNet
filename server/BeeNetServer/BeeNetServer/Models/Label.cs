@@ -11,14 +11,11 @@ namespace BeeNetServer.Models
 
     public class Label
     {
-        private int _num;
         [Key]
         public string Name { get; set; }
         public uint Color { get; set; }
-        public DateTime CreateTime { get; set; }
-        public DateTime EditTime { get; set; }
-
-        public int Num => _num;
-        public List<PictureLabel> PictureLabels { get; set; }
+        public DateTime CreatedTime { get; set; }
+        public DateTime ModifiedTime { get; set; }
+        public int Num { get; set; }
     }
 }

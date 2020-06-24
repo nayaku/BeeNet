@@ -28,23 +28,24 @@ namespace BeeNetServer.Data
                 .HasOne(pt => pt.Picture)
                 .WithMany(t => t.PictureLabels)
                 .HasForeignKey(pt => pt.PictureId);
-            modelBuilder.Entity<PictureLabel>()
-                .HasOne(pt => pt.Label)
-                .WithMany(t => t.PictureLabels)
-                .HasForeignKey(pt => pt.LabelName);
             modelBuilder.Entity<Picture>()
                 .HasIndex(t => t.MD5)
                 .IsUnique();
             modelBuilder.Entity<Picture>()
-                .Property(p => p.AddTime)
-                .HasDefaultValueSql("datetime('now')");
+                .Property(p => p.CreatedTime)
+                .HasDefaultValueSql("datetime('now','localtime')");
             modelBuilder.Entity<Picture>()
-                .Property(p => p.EditTime)
-                .HasDefaultValueSql("datetime('now')");
+                .Property(p => p.ModifiedTime)
+                .HasDefaultValueSql("datetime('now','localtime')");
             modelBuilder.Entity<Label>()
                 .Property(l => l.Num)
-                .HasField("_num")
                 .HasDefaultValue(0);
+            modelBuilder.Entity<Label>()
+                .Property(l=>l.CreatedTime)
+                .HasDefaultValueSql("datetime('now','localtime')");
+            modelBuilder.Entity<Label>()
+                .Property(l=>l.ModifiedTime)
+                .HasDefaultValueSql("datetime('now','localtime')");
         }
 
         

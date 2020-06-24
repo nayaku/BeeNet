@@ -8,8 +8,8 @@ namespace BeeNetServer.Dto
     public class PictureResponseDto
     {
         public uint Id { get; set; }
-        public DateTime AddTime { get; set; }
-        public DateTime EditTime { get; set; }
+        public DateTime CreatedTime { get; set; }
+        public DateTime ModifiedTime { get; set; }
         public string Path { get; set; }
         public int Height { get; set; }
         public int Weight { get; set; }
