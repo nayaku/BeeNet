@@ -28,6 +28,11 @@ namespace BeeNetServer.Data
                 .HasOne(pt => pt.Picture)
                 .WithMany(t => t.PictureLabels)
                 .HasForeignKey(pt => pt.PictureId);
+            modelBuilder.Entity<Workspace>()
+                .HasMany(w=>w.Pictures)
+                .WithOne()
+                .HasForeignKey()
+
             modelBuilder.Entity<Picture>()
                 .HasIndex(t => t.MD5)
                 .IsUnique();
@@ -44,7 +49,7 @@ namespace BeeNetServer.Data
                 .Property(l=>l.CreatedTime)
                 .HasDefaultValueSql("datetime('now','localtime')");
             modelBuilder.Entity<Label>()
-                .Property(l=>l.ModifiedTime)
+                .Property(l => l.ModifiedTime)
                 .HasDefaultValueSql("datetime('now','localtime')");
         }
 

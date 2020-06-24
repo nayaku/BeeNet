@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BeeNetServer.Dto;
 using BeeNetServer.Models;
+using BeeNetServer.Response;
 using System.Linq;
 
 namespace BeeNetServer.Tool
@@ -19,6 +20,7 @@ namespace BeeNetServer.Tool
                         Num = r.Label.Num
                     }).ToList()));
             CreateMap<LabelDto, Label>();
+            CreateMap<Workspace, WorkspaceListItemResponse>();
         }
     }
 }

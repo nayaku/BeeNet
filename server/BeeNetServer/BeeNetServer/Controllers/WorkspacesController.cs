@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BeeNetServer.Data;
 using BeeNetServer.Models;
+using AutoMapper;
+using BeeNetServer.Response;
+using AutoMapper.QueryableExtensions;
 
 namespace BeeNetServer.Controllers
 {
@@ -15,24 +18,26 @@ namespace BeeNetServer.Controllers
     public class WorkspacesController : ControllerBase
     {
         private readonly BeeNetContext _context;
+        private readonly IMapper _mapper;
 
-        public WorkspacesController(BeeNetContext context)
+        public WorkspacesController(BeeNetContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         // GET: api/Workspaces
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Workspace>>> GetWorkspaces()
+        public async Task<ActionResult<IEnumerable<WorkspaceListItemResponse>>> GetWorkspaces()
         {
-            return await _context.Workspaces.ToListAsync();
+            return await _context.Workspaces
+                .ProjectTo<WorkspaceListItemResponse>(_mapper.ConfigurationProvider).ToListAsync();
         }
 
-        // GET: api/Workspaces/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Workspace>> GetWorkspace(string id)
+        [HttpGet("{name}")]
+        public async Task<ActionResult<Workspace>> GetWorkspace(string name)
         {
-            var workspace = await _context.Workspaces.FindAsync(id);
+            var workspace = await _context.Workspaces.FindAsync(name);
 
             if (workspace == null)
             {
@@ -42,16 +47,9 @@ namespace BeeNetServer.Controllers
             return workspace;
         }
 
-        // PUT: api/Workspaces/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutWorkspace(string id, Workspace workspace)
+        [HttpPut]
+        public async Task<IActionResult> PutWorkspace(Workspace workspace)
         {
-            if (id != workspace.Name)
-            {
-                return BadRequest();
-            }
 
             _context.Entry(workspace).State = EntityState.Modified;
 
@@ -61,7 +59,7 @@ namespace BeeNetServer.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!WorkspaceExists(id))
+                if (!WorkspaceExists(workspace.Name))
                 {
                     return NotFound();
                 }
@@ -101,7 +99,7 @@ namespace BeeNetServer.Controllers
         }
 
         // DELETE: api/Workspaces/5
-        [HttpDelete("{id}")]
+        [HttpDelete("{name}")]
         public async Task<ActionResult<Workspace>> DeleteWorkspace(string id)
         {
             var workspace = await _context.Workspaces.FindAsync(id);
