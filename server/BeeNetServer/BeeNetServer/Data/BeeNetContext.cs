@@ -23,15 +23,9 @@ namespace BeeNetServer.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<PictureLabel>()
-                .HasKey(t => new { t.PictureId, t.LabelName });
-            modelBuilder.Entity<PictureLabel>()
-                .HasOne(pt => pt.Picture)
-                .WithMany(t => t.PictureLabels)
-                .HasForeignKey(pt => pt.PictureId);
-            modelBuilder.Entity<Workspace>()
-                .HasMany(w=>w.Pictures)
-                .WithOne()
-                .HasForeignKey()
+                .HasKey(t => new { t.LabelName, t.PictureId });
+            modelBuilder.Entity<WorkspacePicture>()
+                .HasKey(w => new { w.PictureId, w.WorkspaceName });
 
             modelBuilder.Entity<Picture>()
                 .HasIndex(t => t.MD5)
@@ -46,14 +40,14 @@ namespace BeeNetServer.Data
                 .Property(l => l.Num)
                 .HasDefaultValue(0);
             modelBuilder.Entity<Label>()
-                .Property(l=>l.CreatedTime)
+                .Property(l => l.CreatedTime)
                 .HasDefaultValueSql("datetime('now','localtime')");
             modelBuilder.Entity<Label>()
                 .Property(l => l.ModifiedTime)
                 .HasDefaultValueSql("datetime('now','localtime')");
         }
 
-        
+
 
     }
 }

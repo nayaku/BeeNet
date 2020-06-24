@@ -78,30 +78,25 @@ namespace BeeNetServer.Migrations
                     b.Property<int>("Weight")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("WorkspaceName")
-                        .HasColumnType("TEXT");
-
                     b.HasKey("Id");
 
                     b.HasIndex("MD5")
                         .IsUnique();
-
-                    b.HasIndex("WorkspaceName");
 
                     b.ToTable("Pictures");
                 });
 
             modelBuilder.Entity("BeeNetServer.Models.PictureLabel", b =>
                 {
-                    b.Property<uint>("PictureId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("LabelName")
                         .HasColumnType("TEXT");
 
-                    b.HasKey("PictureId", "LabelName");
+                    b.Property<uint>("PictureId")
+                        .HasColumnType("INTEGER");
 
-                    b.HasIndex("LabelName");
+                    b.HasKey("LabelName", "PictureId");
+
+                    b.HasIndex("PictureId");
 
                     b.ToTable("PictureLabels");
                 });
@@ -122,11 +117,19 @@ namespace BeeNetServer.Migrations
                     b.ToTable("Workspaces");
                 });
 
-            modelBuilder.Entity("BeeNetServer.Models.Picture", b =>
+            modelBuilder.Entity("BeeNetServer.Models.WorkspacePicture", b =>
                 {
-                    b.HasOne("BeeNetServer.Models.Workspace", null)
-                        .WithMany("Pictures")
-                        .HasForeignKey("WorkspaceName");
+                    b.Property<uint>("PictureId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("WorkspaceName")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("PictureId", "WorkspaceName");
+
+                    b.HasIndex("WorkspaceName");
+
+                    b.ToTable("WorkspacePicture");
                 });
 
             modelBuilder.Entity("BeeNetServer.Models.PictureLabel", b =>
@@ -140,6 +143,21 @@ namespace BeeNetServer.Migrations
                     b.HasOne("BeeNetServer.Models.Picture", "Picture")
                         .WithMany("PictureLabels")
                         .HasForeignKey("PictureId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("BeeNetServer.Models.WorkspacePicture", b =>
+                {
+                    b.HasOne("BeeNetServer.Models.Picture", "Picture")
+                        .WithMany()
+                        .HasForeignKey("PictureId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BeeNetServer.Models.Workspace", "Workspace")
+                        .WithMany("WorkspacePictures")
+                        .HasForeignKey("WorkspaceName")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

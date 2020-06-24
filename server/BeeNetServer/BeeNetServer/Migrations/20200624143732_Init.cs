@@ -24,6 +24,26 @@ namespace BeeNetServer.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Pictures",
+                columns: table => new
+                {
+                    Id = table.Column<uint>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    CreatedTime = table.Column<DateTime>(nullable: false, defaultValueSql: "datetime('now','localtime')"),
+                    ModifiedTime = table.Column<DateTime>(nullable: false, defaultValueSql: "datetime('now','localtime')"),
+                    Path = table.Column<string>(nullable: true),
+                    Height = table.Column<int>(nullable: false),
+                    Weight = table.Column<int>(nullable: false),
+                    MD5 = table.Column<string>(nullable: true),
+                    PriHash = table.Column<byte[]>(nullable: true),
+                    Type = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Pictures", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Workspaces",
                 columns: table => new
                 {
@@ -37,33 +57,6 @@ namespace BeeNetServer.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Pictures",
-                columns: table => new
-                {
-                    Id = table.Column<uint>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    CreatedTime = table.Column<DateTime>(nullable: false, defaultValueSql: "datetime('now','localtime')"),
-                    ModifiedTime = table.Column<DateTime>(nullable: false, defaultValueSql: "datetime('now','localtime')"),
-                    Path = table.Column<string>(nullable: true),
-                    Height = table.Column<int>(nullable: false),
-                    Weight = table.Column<int>(nullable: false),
-                    MD5 = table.Column<string>(nullable: true),
-                    PriHash = table.Column<byte[]>(nullable: true),
-                    Type = table.Column<int>(nullable: false),
-                    WorkspaceName = table.Column<string>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Pictures", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Pictures_Workspaces_WorkspaceName",
-                        column: x => x.WorkspaceName,
-                        principalTable: "Workspaces",
-                        principalColumn: "Name",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "PictureLabels",
                 columns: table => new
                 {
@@ -72,7 +65,7 @@ namespace BeeNetServer.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PictureLabels", x => new { x.PictureId, x.LabelName });
+                    table.PrimaryKey("PK_PictureLabels", x => new { x.LabelName, x.PictureId });
                     table.ForeignKey(
                         name: "FK_PictureLabels_Labels_LabelName",
                         column: x => x.LabelName,
@@ -87,10 +80,34 @@ namespace BeeNetServer.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "WorkspacePicture",
+                columns: table => new
+                {
+                    WorkspaceName = table.Column<string>(nullable: false),
+                    PictureId = table.Column<uint>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WorkspacePicture", x => new { x.PictureId, x.WorkspaceName });
+                    table.ForeignKey(
+                        name: "FK_WorkspacePicture_Pictures_PictureId",
+                        column: x => x.PictureId,
+                        principalTable: "Pictures",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_WorkspacePicture_Workspaces_WorkspaceName",
+                        column: x => x.WorkspaceName,
+                        principalTable: "Workspaces",
+                        principalColumn: "Name",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
-                name: "IX_PictureLabels_LabelName",
+                name: "IX_PictureLabels_PictureId",
                 table: "PictureLabels",
-                column: "LabelName");
+                column: "PictureId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Pictures_MD5",
@@ -99,8 +116,8 @@ namespace BeeNetServer.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Pictures_WorkspaceName",
-                table: "Pictures",
+                name: "IX_WorkspacePicture_WorkspaceName",
+                table: "WorkspacePicture",
                 column: "WorkspaceName");
         }
 
@@ -108,6 +125,9 @@ namespace BeeNetServer.Migrations
         {
             migrationBuilder.DropTable(
                 name: "PictureLabels");
+
+            migrationBuilder.DropTable(
+                name: "WorkspacePicture");
 
             migrationBuilder.DropTable(
                 name: "Labels");
