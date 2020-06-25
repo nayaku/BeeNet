@@ -35,7 +35,7 @@ namespace BeeNetServer.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PictureResponseDto>>> GetPictures([FromQuery]PictureResourceParamters paramters)
         {
-            var picturesQuery = _context.Pictures.AsQueryable();
+            var picturesQuery = _context.Pictures.Where(p=>p.Type==PictureType.Normal);
             if (!string.IsNullOrWhiteSpace(paramters.SearchKey))
             {
                 picturesQuery = picturesQuery.Where(p => p.PictureLabels.Any(pl => pl.LabelName.Contains(paramters.SearchKey)));
@@ -54,7 +54,10 @@ namespace BeeNetServer.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<PictureResponseDto>> GetPicture(uint id)
         {
-            var picture = await _context.Pictures.FindAsync(id);
+            var picture = await _context.Pictures
+                .ProjectTo<PictureResponseDto>(_mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync();
+            //var picture = await _context.Pictures.FindAsync(id);
 
             if (picture == null)
             {
@@ -100,13 +103,13 @@ namespace BeeNetServer.Controllers
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPost]
-        public async Task<ActionResult<Picture>> PostPicture(List<Picture> pictures)
+        public async Task<ActionResult<Picture>> PostPicture(List<PicturePostParamters> picturePostParamters)
         {
-            if (pictures == null || pictures.Count == 0)
+            if (picturePostParamters ?.Count == 0)
             {
                 return BadRequest();
             }
-
+            var pictures = _mapper.Map<List<Picture>>(picturePostParamters);
             PicturesAddProgress.Push(pictures);
             //_context.Pictures.AddRange(pictures);
             //await _context.SaveChangesAsync();

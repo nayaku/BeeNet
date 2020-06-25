@@ -20,7 +20,9 @@ namespace BeeNetServer.Tool
                         Num = r.Label.Num
                     }).ToList()));
             CreateMap<LabelDto, Label>();
+            CreateMap<Picture, ScreenShotResponseDto>();
             CreateMap<Workspace, WorkspaceListItemResponse>();
+            
         }
     }
 }

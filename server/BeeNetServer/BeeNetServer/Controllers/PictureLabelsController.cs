@@ -50,7 +50,6 @@ namespace BeeNetServer.Controllers
         {
             _context.PictureLabels.Add(pictureLabel);
             await _context.SaveChangesAsync();
-            await _context.Database.ExecuteSqlCommandAsync("UPDATE Labels SET Num=Num+1 WHERE Name = @Name", pictureLabel.LabelName);
 
 
             return CreatedAtAction("GetPictureLabel", new { id = pictureLabel.PictureId, labelName = pictureLabel.LabelName }, pictureLabel);

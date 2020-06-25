@@ -33,6 +33,12 @@ namespace BeeNetServer
             using var context = scope.ServiceProvider.GetRequiredService<BeeNetContext>();
             context.Database.Migrate();
 
+            var trExist = context.Database.ExecuteSqlRaw("SELECT 1 FROM sqlite_master where type='trigger' and name='TrPictureLabelInsert' LIMIT 1");
+            if (trExist == 0)
+                context.Database.ExecuteSqlRaw("CREATE TRIGGER TrPictureLabelInsert AFTER INSERT ON PictureLabels BEGIN UPDATE Labels SET Num=Num+1 WHERE Labels.Name=NEW.LabelName; END; ");
+            trExist = context.Database.ExecuteSqlRaw("SELECT 1 FROM sqlite_master where type='trigger' and name='TrPictureLabelDelete' LIMIT 1");
+            if(trExist == 0)
+                context.Database.ExecuteSqlRaw("CREATE TRIGGER TrPictureLabelDelete AFTER DELETE ON PictureLabels BEGIN UPDATE Labels SET Num = Num - 1 WHERE Name = NEW.LabelName; END; ")
         }
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
@@ -40,5 +46,9 @@ namespace BeeNetServer
                 {
                     webBuilder.UseStartup<Startup>();
                 });
+        public static void CreateTrigger()
+        {
+
+        }
     }
 }
