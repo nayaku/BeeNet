@@ -4,14 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BeeNetServer.Dto
+namespace BeeNetServer.Response
 {
-    public class WorkspaceDto
+    public class WorkspaceResponse
     {
-        public string Name { get; set; }
-        public ushort Index { get; set; }
-        public string Context { get; set; }
-
         public List<PictureBase> Pictures { get; set; }
         public List<PictureBase> ScreenShots { get; set; }
     }

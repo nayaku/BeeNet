@@ -15,6 +15,7 @@ using BeeNetServer.Dto;
 using BeeNetServer.Response;
 using AutoMapper.QueryableExtensions;
 using System.Linq.Dynamic.Core;
+using BeeNetServer.Tool;
 
 namespace BeeNetServer.Controllers
 {
@@ -33,14 +34,14 @@ namespace BeeNetServer.Controllers
 
         // GET: api/Pictures
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<PictureResponseDto>>> GetPictures([FromQuery]PictureResourceParamters paramters)
+        public async Task<ActionResult<IEnumerable<PictureResponseDto>>> GetPictures([FromQuery] PictureResourceParamters paramters)
         {
-            var picturesQuery = _context.Pictures.Where(p=>p.Type==PictureType.Normal);
+            var picturesQuery = _context.Pictures.AsQueryable();
             if (!string.IsNullOrWhiteSpace(paramters.SearchKey))
             {
                 picturesQuery = picturesQuery.Where(p => p.PictureLabels.Any(pl => pl.LabelName.Contains(paramters.SearchKey)));
             }
-            if(!string.IsNullOrWhiteSpace(paramters.OrderBy))
+            if (!string.IsNullOrWhiteSpace(paramters.OrderBy))
             {
                 picturesQuery = picturesQuery.OrderBy(paramters.OrderBy);
             }
@@ -56,48 +57,16 @@ namespace BeeNetServer.Controllers
         {
             var picture = await _context.Pictures
                 .ProjectTo<PictureResponseDto>(_mapper.ConfigurationProvider)
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(p=>p.Id == id);
             //var picture = await _context.Pictures.FindAsync(id);
 
             if (picture == null)
             {
                 return NotFound();
             }
-            var pictureDto =  _mapper.Map<PictureResponseDto>(picture);
-            return pictureDto;
+            // var pictureDto = _mapper.Map<PictureResponseDto>(picture);
+            return picture;
         }
-
-        //// PUT: api/Pictures/5
-        //// To protect from overposting attacks, please enable the specific properties you want to bind to, for
-        //// more details see https://aka.ms/RazorPagesCRUD.
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> PutPicture(uint id, Picture picture)
-        //{
-        //    if (id != picture.Id)
-        //    {
-        //        return BadRequest();
-        //    }
-
-        //    _context.Entry(picture).State = EntityState.Modified;
-
-        //    try
-        //    {
-        //        await _context.SaveChangesAsync();
-        //    }
-        //    catch (DbUpdateConcurrencyException)
-        //    {
-        //        if (!PictureExists(id))
-        //        {
-        //            return NotFound();
-        //        }
-        //        else
-        //        {
-        //            throw;
-        //        }
-        //    }
-
-        //    return NoContent();
-        //}
 
         // POST: api/Pictures
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
@@ -105,7 +74,7 @@ namespace BeeNetServer.Controllers
         [HttpPost]
         public async Task<ActionResult<Picture>> PostPicture(List<PicturePostParamters> picturePostParamters)
         {
-            if (picturePostParamters ?.Count == 0)
+            if (picturePostParamters?.Count == 0)
             {
                 return BadRequest();
             }
@@ -128,7 +97,7 @@ namespace BeeNetServer.Controllers
 
             _context.Pictures.Remove(picture);
             await _context.SaveChangesAsync();
-
+            System.IO.File.Delete(picture.Path);
             return Ok();
         }
     }

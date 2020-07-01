@@ -16,6 +16,7 @@ namespace BeeNetServer.Data
         { }
 
         public DbSet<Picture> Pictures { get; set; }
+        public DbSet<ScreenShot> ScreenShots { get; set; }
         public DbSet<Label> Labels { get; set; }
         public DbSet<PictureLabel> PictureLabels { get; set; }
         public DbSet<Workspace> Workspaces { get; set; }
@@ -32,9 +33,6 @@ namespace BeeNetServer.Data
                 .IsUnique();
             modelBuilder.Entity<Picture>()
                 .Property(p => p.CreatedTime)
-                .HasDefaultValueSql("datetime('now','localtime')");
-            modelBuilder.Entity<Picture>()
-                .Property(p => p.ModifiedTime)
                 .HasDefaultValueSql("datetime('now','localtime')");
             modelBuilder.Entity<Label>()
                 .Property(l => l.Num)

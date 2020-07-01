@@ -7,12 +7,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BeeNetServer.Data;
 using BeeNetServer.Models;
-using BeeNetServer.Dto;
-using BeeNetServer.Parameters;
-using System.Linq.Dynamic.Core;
 using AutoMapper.QueryableExtensions;
 using AutoMapper;
+using BeeNetServer.Parameters;
 using System.IO;
+using System.Drawing;
+using System.Windows.Media.Imaging;
 
 namespace BeeNetServer.Controllers
 {
@@ -29,77 +29,79 @@ namespace BeeNetServer.Controllers
             _mapper = mapper;
         }
 
-        // GET: api/ScreenShot
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<ScreenShotResponseDto>>> GetPictures([FromQuery]ScreenShotsResourceParamters paramters)
-        {
-            return await _context.Pictures.Where(p => p.Type == PictureType.Screenshot)
-                .Skip((paramters.PageNumber - 1) * paramters.PageSize)
-                .Take(paramters.PageSize)
-                .OrderBy(paramters.OrderBy)
-                .ProjectTo<ScreenShotResponseDto>(_mapper.ConfigurationProvider)
-                .ToListAsync();
-        }
-
-        // GET: api/ScreenShot/5
+        // GET: api/ScreenShots/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<ScreenShotResponseDto>> GetPicture(uint id)
+        public async Task<ActionResult<PictureBase>> GetScreenShot(uint id)
         {
-            var picture = await _context.PictureLabels
-                .Where(p=>p.PictureId == id)
-                .ProjectTo<ScreenShotResponseDto>(_mapper.ConfigurationProvider)
-                .FirstOrDefaultAsync();
-            if (picture == null)
+            var screenShot = await  _context.ScreenShots
+                .ProjectTo<PictureBase>(_mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync(p=> p.Id == id);
+
+            if (screenShot == null)
             {
                 return NotFound();
             }
 
-            return picture;
+            return screenShot;
         }
 
-        private async Task SaveScreenShot()
-        {
-
-        }
-
-        // POST: api/ScreenShot
+        // POST: api/ScreenShots
+        // To protect from overposting attacks, enable the specific properties you want to bind to, for
+        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
-        public async Task<ActionResult<Picture>> PostPicture(ScreenShotPostParamters postParamters)
+        public async Task<ActionResult<ScreenShot>> PostScreenShot(ScreenShotPostParamters paramters)
         {
-            var picture = _mapper.Map<Picture>
-            HashUtil.ComplementPicture(picture);
-            var picture = pictureExtension.Picture;
-            var newFileName = picture.MD5 + Path.GetExtension(picture.Path);
-            var newFilePath = Path.Combine(UserSettingReader.UserSettings.PictureSettings.PictureStorePath, newFileName);
-            File.Copy(picture.Path, newFilePath, true);
-            picture.Path = newFilePath;
+            var screenShot = new ScreenShot
+            {
+                WorkspaceName = paramters.WorkspaceName
+            };
 
+            // 文件路径
+            var dirPathString = UserSettingReader.UserSettings.PictureSettings.ScreenShotPath;
+            while (true)
+            {
+                var filePathString = Path.Combine(dirPathString, Path.GetTempPath() + paramters.Ext);
+                if (!System.IO.File.Exists(filePathString))
+                {
+                    screenShot.Path = filePathString;
+                    break;
+                }
+            }
+            
+            // 读取文件尺寸
+            using (var memoryStream = new MemoryStream(paramters.Data))
+            {
+                using var bitmap = new Bitmap(memoryStream);
+                screenShot.Height = bitmap.Height;
+                screenShot.Width = bitmap.Width;
+            }
 
-            _context.Pictures.Add(picture);
+            // 写入文件
+            using (var outputStream = System.IO.File.Create(screenShot.Path))
+            {
+                await outputStream.WriteAsync(paramters.Data,0,paramters.Data.Length);
+            }
+                
+            _context.ScreenShots.Add(screenShot);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetPicture", new { id = picture.Id }, picture);
+            return CreatedAtAction("GetScreenShot", new { id = screenShot.Id }, screenShot);
         }
 
-        // DELETE: api/ScreenShot/5
+        // DELETE: api/ScreenShots/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Picture>> DeletePicture(uint id)
+        public async Task<ActionResult<ScreenShot>> DeleteScreenShot(uint id)
         {
-            var picture = await _context.Pictures.FindAsync(id);
-            if (picture == null)
+            var screenShot = await _context.ScreenShots.FindAsync(id);
+            if (screenShot == null)
             {
                 return NotFound();
             }
 
-            _context.Pictures.Remove(picture);
+            _context.ScreenShots.Remove(screenShot);
             await _context.SaveChangesAsync();
-
-            return picture;
-        }
-
-        private bool PictureExists(uint id)
-        {
-            return _context.Pictures.Any(e => e.Id == id);
+            System.IO.File.Delete(screenShot.Path);
+            return screenShot;
         }
     }
 }

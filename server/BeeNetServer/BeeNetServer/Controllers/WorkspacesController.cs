@@ -10,6 +10,8 @@ using BeeNetServer.Models;
 using AutoMapper;
 using BeeNetServer.Response;
 using AutoMapper.QueryableExtensions;
+using BeeNetServer.Dto;
+using BeeNetServer.Parameters;
 
 namespace BeeNetServer.Controllers
 {
@@ -35,9 +37,11 @@ namespace BeeNetServer.Controllers
         }
 
         [HttpGet("{name}")]
-        public async Task<ActionResult<Workspace>> GetWorkspace(string name)
+        public async Task<ActionResult<WorkspaceDto>> GetWorkspace(string name)
         {
-            var workspace = await _context.Workspaces.FindAsync(name);
+            var workspace = await _context.Workspaces
+                .ProjectTo<WorkspaceDto>(_mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync(w => w.Name == name);
 
             if (workspace == null)
             {
@@ -48,7 +52,7 @@ namespace BeeNetServer.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> PutWorkspace(Workspace workspace)
+        public async Task<IActionResult> PutWorkspace(WorkspacePutParamters paramters)
         {
 
             _context.Entry(workspace).State = EntityState.Modified;

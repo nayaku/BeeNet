@@ -15,5 +15,6 @@ namespace BeeNetServer.Models
         public string Context { get; set; }
 
         public List<WorkspacePicture> WorkspacePictures { get; set; }
+        public List<ScreenShot> ScreenShots { get; set; }
     }
 }

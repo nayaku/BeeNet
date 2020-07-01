@@ -85,7 +85,7 @@ namespace BeeNetServer.Tool
         {
             using var stream = File.OpenRead(picture.Path);
             var bitmapSource = BitmapFrame.Create(stream);
-            picture.Weight = bitmapSource.PixelWidth;
+            picture.Width = bitmapSource.PixelWidth;
             picture.Height = bitmapSource.PixelHeight;
             using var md5Hash = MD5.Create();
             var imageBitArray = bitmapSource.ToByteImage().Array;

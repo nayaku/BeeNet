@@ -7,5 +7,10 @@ namespace BeeNetServer.Dto
 {
     public class ScreenShotResponseDto
     {
+        public uint Id { get; set; }
+        public DateTime CreatedTime { get; set; }
+        public string Path { get; set; }
+        public int Height { get; set; }
+        public int Weight { get; set; }
     }
 }
