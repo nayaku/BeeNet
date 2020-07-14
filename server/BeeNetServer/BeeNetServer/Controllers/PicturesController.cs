@@ -1,21 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BeeNetServer.Data;
 using BeeNetServer.Models;
 using BeeNetServer.Background;
-using BeeNetServer.CException;
 using AutoMapper;
 using BeeNetServer.Parameters;
-using BeeNetServer.Dto;
-using BeeNetServer.Response;
 using AutoMapper.QueryableExtensions;
 using System.Linq.Dynamic.Core;
-using BeeNetServer.Tool;
+using BeeNetServer.Response.Picture;
+using BeeNetServer.Parameters.Picture;
 
 namespace BeeNetServer.Controllers
 {
@@ -34,30 +30,28 @@ namespace BeeNetServer.Controllers
 
         // GET: api/Pictures
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<PictureResponseDto>>> GetPictures([FromQuery] PictureResourceParamters paramters)
+        public async Task<ActionResult<IEnumerable<PictureGetResponse>>> GetPictures([FromQuery] PictureGetsParamter paramters)
         {
             var picturesQuery = _context.Pictures.AsQueryable();
-            if (!string.IsNullOrWhiteSpace(paramters.SearchKey))
-            {
-                picturesQuery = picturesQuery.Where(p => p.PictureLabels.Any(pl => pl.LabelName.Contains(paramters.SearchKey)));
-            }
-            if (!string.IsNullOrWhiteSpace(paramters.OrderBy))
-            {
-                picturesQuery = picturesQuery.OrderBy(paramters.OrderBy);
-            }
+            if (paramters.IsOrderByAddTimeDesc)
+                picturesQuery.OrderByDescending(p => p.CreatedTime);
+            else
+                picturesQuery.OrderBy(p => p.CreatedTime);
+
             picturesQuery = picturesQuery.Skip((paramters.PageNumber - 1) * paramters.PageNumber)
                 .Take(paramters.PageNumber);
 
-            return await picturesQuery.ProjectTo<PictureResponseDto>(_mapper.ConfigurationProvider).ToListAsync();
+            return await picturesQuery.ProjectTo<PictureGetResponse>(_mapper.ConfigurationProvider)
+                .ToListAsync();
         }
 
         // GET: api/Pictures/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<PictureResponseDto>> GetPicture(uint id)
+        public async Task<ActionResult<PictureGetResponse>> GetPicture(uint id)
         {
             var picture = await _context.Pictures
-                .ProjectTo<PictureResponseDto>(_mapper.ConfigurationProvider)
-                .FirstOrDefaultAsync(p=>p.Id == id);
+                .ProjectTo<PictureGetResponse>(_mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync(p => p.Id == id);
             //var picture = await _context.Pictures.FindAsync(id);
 
             if (picture == null)
@@ -72,14 +66,14 @@ namespace BeeNetServer.Controllers
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPost]
-        public async Task<ActionResult<Picture>> PostPicture(List<PicturePostParamters> picturePostParamters)
+        public async Task<ActionResult<Picture>> PostPicture(PicturePostParameters parameters)
         {
             if (picturePostParamters?.Count == 0)
             {
                 return BadRequest();
             }
             var pictures = _mapper.Map<List<Picture>>(picturePostParamters);
-            PicturesAddProgress.Push(pictures);
+            PicturesAddProgress.CreateTask(pictures);
             //_context.Pictures.AddRange(pictures);
             //await _context.SaveChangesAsync();
             return new AcceptedResult();

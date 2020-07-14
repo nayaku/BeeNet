@@ -5,15 +5,13 @@ using System.Threading.Tasks;
 
 namespace BeeNetServer.Parameters
 {
-    public abstract class ResourceParamtersBase
+
+    public class PictureGetsParamter
     {
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = UserSettingReader.UserSettings.RequestSettings.PageNum;
-        public string OrderBy { get; set; }
-    }
-    public abstract class ResourceParamters : ResourceParamtersBase
-    {
-        public string SearchKey { get; set; }
+        public bool IsOrderByAddTimeDesc { get; set; } = true;
+        public List<string> LimitLabels { get; set; }
 
     }
 }

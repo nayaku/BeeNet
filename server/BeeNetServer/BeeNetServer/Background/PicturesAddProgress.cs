@@ -1,6 +1,7 @@
 ﻿using BeeNetServer.CException;
 using BeeNetServer.Data;
 using BeeNetServer.Models;
+using BeeNetServer.Parameters.Picture;
 using BeeNetServer.Resources;
 using BeeNetServer.Tool;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,28 +21,40 @@ namespace BeeNetServer.Background
         /// <summary>
         /// 待添加的图片列表
         /// </summary>
-        public static List<PictureExtension> PictureExtensions { get; set; }
+        public static PicturePostParameters PicturePostParameters { get; set; }
         /// <summary>
         /// 进度指示器
         /// </summary>
-        public static TaskProgressIndicator TaskProgress { get; set; } = new TaskProgressIndicator();
+        public static AddPicturesProgressIndicator TaskProgress { get; set; }
         /// <summary>
         /// 工作任务
         /// </summary>
         private static Task _workTask = null;
 
-        public static void Push(List<Picture> pictures)
+        /// <summary>
+        /// 创建任务
+        /// </summary>
+        /// <param name="pictures"></param>
+        public static void CreateTask(List<Picture> pictures)
         {
-            TaskProgress.TaskProgressStatus = TaskProgressStatus.Running;
+            TaskProgress = new AddPicturesProgressIndicator();
             TaskProgress.SetProgress(0, "准备执行。");
-            PictureExtensions = pictures.Select(p => new PictureExtension { Picture = p }).ToList();
-            //PictureExtensions = new List<PictureExtension>(pictures.Count);
-            //foreach (var picture in pictures)
-            //{
-            //    PictureExtensions.Add(new PictureExtension { Picture = picture });
-            //}
+            
             _workTask = new Task(Run, TaskCreationOptions.LongRunning);
             _workTask.Start();
+        }
+
+        public static void SaveImage()
+        {
+            foreach(var formFile in  PicturePostParameters.ImageFiles)
+            {
+                using (var stream = formFile.OpenReadStream())
+                {
+                    using var buffered= new BufferedStream(stream);
+                    HashUtil.GetMD5(buffered)
+                }
+                    
+            }
         }
 
         /// <summary>
@@ -141,7 +154,7 @@ namespace BeeNetServer.Background
             TaskProgress.SetProgress(1.0f, Resource.SavingDatabaseChange);
             context.SaveChanges();
             TaskProgress.SetProgress(1.0f, Resource.OperateFinish);
-            TaskProgress.TaskProgressStatus = TaskProgressStatus.Finished;
+            TaskProgress.TaskProgressStatus = AddPicturesProgressStatus.Finished;
         }
 
         /// <summary>
@@ -161,7 +174,7 @@ namespace BeeNetServer.Background
 
         public static async Task<Picture> ForceAddPicture(Picture picture)
         {
-            if (TaskProgress.TaskProgressStatus == TaskProgressStatus.Finished)
+            if (TaskProgress.TaskProgressStatus == AddPicturesProgressStatus.Finished)
             {
                 var res = PictureExtensions.SingleOrDefault(p => p.Picture.Path == picture.Path);
                 if (res != null)

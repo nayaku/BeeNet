@@ -9,5 +9,6 @@ namespace BeeNetServer.Models
     {
         public string WorkspaceName { get; set; }
         public Workspace Workspace { get; set; }
+        public string Extension { get; set; }
     }
 }

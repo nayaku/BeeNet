@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BeeNetServer.Response
+namespace BeeNetServer.Response.Label
 {
-    public class WorkspaceListItemResponse
+    public class LabelGetResponse
     {
         public string Name { get; set; }
-        public ushort Index { get; set; }
+        public uint Color { get; set; }
+        public int Num { get; set; }
     }
 }

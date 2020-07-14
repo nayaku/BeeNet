@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Shipwreck.Phash.PresentationCore;
 using System.Windows.Media.Imaging;
 using BeeNetServer.Models;
+using FreeImageAPI;
 
 namespace BeeNetServer.Tool
 {
@@ -58,6 +59,22 @@ namespace BeeNetServer.Tool
         //    return hash;
         //}
 
+        public static (int Width,int Height) GetSize(Stream stream)
+        {
+            var bitmap=FreeImageBitmap.FromStream(stream);
+            return (bitmap.Width, bitmap.Height);
+        }
+
+        public static string GetMD5(Stream stream)
+        {
+            var hashAlgorithm = new MD5CryptoServiceProvider();
+            var md5Bytes=hashAlgorithm.ComputeHash(stream);
+            hashAlgorithm.Clear();
+            string md5 = BitConverter.ToString(md5Bytes);
+            md5 = md5.Replace("-", "");
+            return md5;
+        }
+
         /// <summary>
         /// 判断两个特征值相似度是否大于阀值
         /// </summary>
@@ -81,9 +98,8 @@ namespace BeeNetServer.Tool
         /// 完善图片信息（包括尺寸、MD5、特征值）
         /// </summary>
         /// <param name="picture"></param>
-        public static void ComplementPicture(Picture picture)
+        public static void ComplementPicture(Picture picture,Stream stream)
         {
-            using var stream = File.OpenRead(picture.Path);
             var bitmapSource = BitmapFrame.Create(stream);
             picture.Width = bitmapSource.PixelWidth;
             picture.Height = bitmapSource.PixelHeight;

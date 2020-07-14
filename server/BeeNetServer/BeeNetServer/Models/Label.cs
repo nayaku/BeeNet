@@ -14,8 +14,6 @@ namespace BeeNetServer.Models
         [Key]
         public string Name { get; set; }
         public uint Color { get; set; }
-        public DateTime CreatedTime { get; set; }
-        public DateTime ModifiedTime { get; set; }
         public int Num { get; set; }
     }
 }

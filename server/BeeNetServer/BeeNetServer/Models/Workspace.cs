@@ -12,7 +12,6 @@ namespace BeeNetServer.Models
         [Key]
         public string Name { get; set; }
         public ushort Index { get; set; }
-        public string Context { get; set; }
 
         public List<WorkspacePicture> WorkspacePictures { get; set; }
         public List<ScreenShot> ScreenShots { get; set; }

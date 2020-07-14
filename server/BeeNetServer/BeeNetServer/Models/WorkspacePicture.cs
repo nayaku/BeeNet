@@ -11,5 +11,6 @@ namespace BeeNetServer.Models
         public string WorkspaceName { get; set; }
         public Picture Picture { get; set; }
         public uint PictureId { get; set; }
+        public string Extension { get; set; }
     }
 }

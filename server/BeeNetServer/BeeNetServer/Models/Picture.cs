@@ -9,6 +9,8 @@ namespace BeeNetServer.Models
 {
     public class Picture:PictureBase
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public DateTime CreatedTime { get; set; }
         public string MD5 { get; set; }
         public byte[] PriHash { get; set; }
 

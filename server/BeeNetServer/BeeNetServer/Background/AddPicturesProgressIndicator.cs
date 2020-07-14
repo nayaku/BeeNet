@@ -9,7 +9,7 @@ namespace BeeNetServer.Background
     /// <summary>
     /// 进度状态指示
     /// </summary>
-    public class TaskProgressIndicator
+    public class AddPicturesProgressIndicator
     {
         /// <summary>
         /// 当前进度数值
@@ -22,12 +22,13 @@ namespace BeeNetServer.Background
         /// <summary>
         /// 当前步骤状态
         /// </summary>
-        public TaskProgressStatus TaskProgressStatus { get; set; }
+        public AddPicturesProgressStatus TaskProgressStatus { get; set; }
+        public List<AddPicturesProgressResult> PictureResults { get; set; }
         /// <summary>
         /// 是否繁忙
         /// </summary>
         /// <returns></returns>
-        public bool IsBusy => TaskProgressStatus == TaskProgressStatus.Running;
+        public bool IsBusy => TaskProgressStatus == AddPicturesProgressStatus.Running;
         /// <summary>
         /// 设置进度
         /// </summary>
@@ -39,10 +40,21 @@ namespace BeeNetServer.Background
             Information = text;
         }
     }
-    public enum TaskProgressStatus
+    public enum AddPicturesProgressStatus
     {
-        Empty = 0,
         Running,
         Finished,
+    }
+    public class AddPicturesProgressResult
+    {
+        public AddPicturesProgressResultStatusEnum Result { get; set; }
+        public int ConflictPictureId { get; set; }
+    }
+    public enum AddPicturesProgressResultStatusEnum
+    {
+        Pending,
+        Processing,
+        Done,
+        Conflict
     }
 }

@@ -34,15 +34,15 @@ namespace BeeNetServer.Data
             modelBuilder.Entity<Picture>()
                 .Property(p => p.CreatedTime)
                 .HasDefaultValueSql("datetime('now','localtime')");
+            modelBuilder.Entity<Picture>()
+                .HasIndex(p => p.CreatedTime);
             modelBuilder.Entity<Label>()
                 .Property(l => l.Num)
                 .HasDefaultValue(0);
             modelBuilder.Entity<Label>()
-                .Property(l => l.CreatedTime)
-                .HasDefaultValueSql("datetime('now','localtime')");
-            modelBuilder.Entity<Label>()
-                .Property(l => l.ModifiedTime)
-                .HasDefaultValueSql("datetime('now','localtime')");
+                .HasIndex(l => l.Num);
+            modelBuilder.Entity<Workspace>()
+                .HasIndex(w => w.Index);
         }
 
 
