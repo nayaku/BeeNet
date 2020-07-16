@@ -4,9 +4,13 @@ using BeeNetServer.Models;
 using BeeNetServer.Parameters.Picture;
 using BeeNetServer.Resources;
 using BeeNetServer.Tool;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,42 +23,72 @@ namespace BeeNetServer.Background
     public static class PicturesAddProgress
     {
         /// <summary>
-        /// 待添加的图片列表
-        /// </summary>
-        public static PicturePostParameters PicturePostParameters { get; set; }
-        /// <summary>
         /// 进度指示器
         /// </summary>
         public static AddPicturesProgressIndicator TaskProgress { get; set; }
+
+        /// <summary>
+        /// 待添加的图片列表
+        /// </summary>
+        private static PicturePostParameters _picturePostParameters;
         /// <summary>
         /// 工作任务
         /// </summary>
-        private static Task _workTask = null;
+        private static Task _workTask;
+        private static IConfiguration _configuration;
 
         /// <summary>
         /// 创建任务
         /// </summary>
         /// <param name="pictures"></param>
-        public static void CreateTask(List<Picture> pictures)
+        public static void CreateTask(PicturePostParameters parameters, IConfiguration configuration)
         {
-            TaskProgress = new AddPicturesProgressIndicator();
-            TaskProgress.SetProgress(0, "准备执行。");
-            
+            _picturePostParameters = parameters;
+            _configuration = configuration;
+            var len = _picturePostParameters.ImageFiles != null ? _picturePostParameters.ImageFiles.Count : _picturePostParameters.Paths.Count;
+            TaskProgress = new AddPicturesProgressIndicator(len);
+            TaskProgress.SetProgress(0, Resource.ReadyToRun);
+
             _workTask = new Task(Run, TaskCreationOptions.LongRunning);
             _workTask.Start();
         }
 
-        public static void SaveImage()
+        /// <summary>
+        /// 尝试添加图片
+        /// </summary>
+        /// <param name="stream">文件流</param>
+        /// <param name="context">数据库上下文</param>
+        /// <param name="Extension">扩展名</param>
+        /// <param name="md5Set">md5集合</param>
+        /// <returns>(图片，冲突ID)</returns>
+        public static (Picture, uint) TryAddImage(Stream stream, BeeNetContext context, string Extension, HashSet<string> md5Set)
         {
-            foreach(var formFile in  PicturePostParameters.ImageFiles)
-            {
-                using (var stream = formFile.OpenReadStream())
-                {
-                    using var buffered= new BufferedStream(stream);
-                    HashUtil.GetMD5(buffered)
-                }
-                    
-            }
+            var picture = new Picture();
+            using var bufferedStream = new BufferedStream(stream);
+            picture.MD5 = HashUtil.GetMD5(bufferedStream);
+            bufferedStream.Seek(0, SeekOrigin.Begin);
+            // 判断MD5是否冲突
+            if (md5Set.Contains(picture.MD5))
+                return (null, 0);
+            md5Set.Add(picture.MD5);
+            var id = context.Pictures.Where(p => p.MD5 == picture.MD5).Take(1).Select(p => p.Id).FirstOrDefault();
+            if (id != 0)
+                return (null, id);
+            // 获取尺寸
+            (picture.Width, picture.Height) = HashUtil.GetSize(stream);
+            bufferedStream.Seek(0, SeekOrigin.Begin);
+            // 写入文件
+            var imageFolder = _configuration["ServerSettings:PictureStorePath"];
+            var childFolder = $"{DateTime.Today:yyyy_MM}";
+            var childPath = Path.Join(imageFolder, childFolder);
+            Directory.CreateDirectory(childPath);
+            var imagePath = Path.Join(childPath, picture.MD5 + Extension);
+            using var outputStream = File.OpenWrite(imagePath);
+            bufferedStream.CopyTo(outputStream);
+            // 添加到数据库
+            picture.Path = childFolder + "/" + picture.MD5 + Extension;
+            context.Pictures.Add(picture);
+            return (picture, 0);
         }
 
         /// <summary>
@@ -62,140 +96,65 @@ namespace BeeNetServer.Background
         /// </summary>
         public static void Run()
         {
-            // 从本地添加
             using var scope = Program.IHost.Services.CreateScope();
             var services = scope.ServiceProvider;
             using var context = scope.ServiceProvider.GetRequiredService<BeeNetContext>();
-
-            Dictionary<string, Picture> md5Dict = new Dictionary<string, Picture>();
-            for (int idx = 0; idx < PictureExtensions.Count; idx++)
+            // 是否为本地添加
+            var isFromLocal = _picturePostParameters.Paths != null;
+            var len = _picturePostParameters.ImageFiles != null ? _picturePostParameters.ImageFiles.Count : _picturePostParameters.Paths.Count;
+            var pictures = new List<Picture>(len);
+            var md5Set = new HashSet<string>(len);
+            // 遍历列表
+            for (var index = 0; index < len; index++)
             {
-                var pictureExtension = PictureExtensions[idx];
-                var picture = pictureExtension.Picture;
-                TaskProgress.SetProgress((float)idx / PictureExtensions.Count, string.Format(Resource.AddingPicture, Path.GetFileName(picture.Path)));
-                HashUtil.ComplementPicture(picture);
-                if (File.Exists(picture.Path))
+                string fileName, extension, path;
+                IFormFile formFile;
+                Stream stream;
+                TaskProgress.PictureResults[index].Result = AddPicturesProgressResultStatusEnum.Processing;
+                // 获取图片文件名等外部信息
+                if (isFromLocal)
                 {
-                    //var md5 = picture.MD5 = HashUtil.GetMD5ByHashAlgorithm(picture.Path);
-                    var md5 = picture.MD5;
-                    // 队列中是否已经包含相同图片
-                    if (!md5Dict.ContainsKey(md5))
-                    {
-                        var conflictPicture = context.Pictures.FirstOrDefault(p => p.MD5 == md5);
-                        if (conflictPicture == null)
-                        {
-                            // 启动相似性判断
-                            if (UserSettingReader.UserSettings.PictureSettings.UseSimilarJudge)
-                            {
-                                //picture.PriHash = HashUtil.PriHash(picture.Path);
-                                var conflictPictures = new List<Picture>();
-                                var resPictures = context.Pictures;
-                                foreach (var resPicture in resPictures)
-                                {
-                                    if (HashUtil.IsSimilar(picture.PriHash, resPicture.PriHash))
-                                    {
-                                        conflictPictures.Add(resPicture);
-                                    }
-                                }
-                                foreach (var resPicture in PictureExtensions)
-                                {
-                                    if (resPicture.Picture != picture)
-                                    {
-                                        if (HashUtil.IsSimilar(picture.PriHash, resPicture.Picture.PriHash))
-                                        {
-                                            conflictPictures.Add(resPicture.Picture);
-                                        }
-                                    }
-                                    else
-                                    {
-                                        break;
-                                    }
-                                }
-                                if (conflictPictures.Count == 0)
-                                {
-                                    // 通过判断
-                                    md5Dict.Add(md5, picture);
-                                    AddPicture(pictureExtension);
-                                    context.Pictures.Add(picture);
+                    path = _picturePostParameters.Paths[index];
+                    fileName = Path.GetFileNameWithoutExtension(path);
+                    extension = Path.GetExtension(path);
+                    stream = File.OpenRead(fileName);
 
-                                }
-                                else
-                                {
-                                    pictureExtension.SetError(Resource.SimilarPicture, conflictPictures);
-                                }
-                            }
-                            else
-                            {
-                                picture.PriHash = null;
-                                // 通过判断
-                                md5Dict.Add(md5, picture);
-                                AddPicture(pictureExtension);
-                                context.Pictures.Add(picture);
-                            }
-
-                        }
-                        else
-                        {
-                            pictureExtension.SetError(Resource.SamePictureInGallery, new List<Picture> { conflictPicture });
-                        }
-
-                    }
-                    else
-                    {
-                        pictureExtension.SetError(Resource.SamePictureInQueue, new List<Picture> { md5Dict[md5] });
-                    }
                 }
                 else
                 {
-                    pictureExtension.SetError(Resource.FileNotExist);
+                    formFile = _picturePostParameters.ImageFiles[index];
+                    fileName = Path.GetFileNameWithoutExtension(formFile.FileName);
+                    extension = Path.GetExtension(formFile.FileName);
+                    stream = formFile.OpenReadStream();
                 }
-
+                // 开始处理文件内容
+                TaskProgress.SetProgress(1.0f * (index + 1) / len * 0.99f, string.Format(Resource.AddingPicture, fileName));
+                (var picture, var conflictId) = TryAddImage(stream, context, extension,md5Set);
+                // 处理结果
+                var progressResult = TaskProgress.PictureResults[index];
+                if (picture == null)
+                {
+                    progressResult.Result = AddPicturesProgressResultStatusEnum.Conflict;
+                    progressResult.ConflictPictureId = conflictId;
+                }
+                else
+                {
+                    progressResult.Result = AddPicturesProgressResultStatusEnum.Done;
+                    progressResult.Id = picture.Id;
+                    progressResult.Path = picture.Path;
+                    progressResult.Height = picture.Height;
+                    progressResult.Width = progressResult.Width;
+                }
             }
-            TaskProgress.SetProgress(1.0f, Resource.SavingDatabaseChange);
+            TaskProgress.SetProgress(0.99f, Resource.SavingDatabaseChange);
             context.SaveChanges();
+            for(var index=0;index<len;index++)
+            {
+                if(pictures[index]!=null)
+                    TaskProgress.PictureResults[index].Id = pictures[index].Id;
+            }
             TaskProgress.SetProgress(1.0f, Resource.OperateFinish);
             TaskProgress.TaskProgressStatus = AddPicturesProgressStatus.Finished;
-        }
-
-        /// <summary>
-        /// 添加图片
-        /// </summary>
-        /// <param name="pictureExtension"></param>
-        /// <param name="md5"></param>
-        private static void AddPicture(PictureExtension pictureExtension)
-        {
-            pictureExtension.Succeed();
-            var picture = pictureExtension.Picture;
-            var newFileName = picture.MD5 + Path.GetExtension(picture.Path);
-            var newFilePath = Path.Combine(UserSettingReader.UserSettings.PictureSettings.PictureStorePath, newFileName);
-            File.Copy(picture.Path, newFilePath, true);
-            picture.Path = newFilePath;
-        }
-
-        public static async Task<Picture> ForceAddPicture(Picture picture)
-        {
-            if (TaskProgress.TaskProgressStatus == AddPicturesProgressStatus.Finished)
-            {
-                var res = PictureExtensions.SingleOrDefault(p => p.Picture.Path == picture.Path);
-                if (res != null)
-                {
-                    using var scope = Program.IHost.Services.CreateScope();
-                    var services = scope.ServiceProvider;
-                    using var context = scope.ServiceProvider.GetRequiredService<BeeNetContext>();
-                    context.Pictures.Add(res.Picture);
-                    await context.SaveChangesAsync();
-                    res.Succeed();
-                    return res.Picture;
-                }
-                else
-                {
-                    throw new SimpleException(Resource.NotFindPictureInQueue);
-                }
-            }
-            else
-            {
-                throw new SimpleException(Resource.IllegalOperateBecausePreviousNotFinish);
-            }
         }
 
     }

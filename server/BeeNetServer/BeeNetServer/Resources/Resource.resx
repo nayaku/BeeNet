@@ -132,6 +132,9 @@
   <data name="OperateFinish" xml:space="preserve">
     <value>操作完成。</value>
   </data>
+  <data name="ReadyToRun" xml:space="preserve">
+    <value>准备执行。</value>
+  </data>
   <data name="SamePictureInGallery" xml:space="preserve">
     <value>库中已经存在相同图片。</value>
   </data>

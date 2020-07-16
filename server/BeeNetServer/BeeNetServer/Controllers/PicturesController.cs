@@ -9,9 +9,11 @@ using BeeNetServer.Background;
 using AutoMapper;
 using BeeNetServer.Parameters;
 using AutoMapper.QueryableExtensions;
-using System.Linq.Dynamic.Core;
 using BeeNetServer.Response.Picture;
 using BeeNetServer.Parameters.Picture;
+using Microsoft.Extensions.Configuration;
+using System.IO;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace BeeNetServer.Controllers
 {
@@ -21,18 +23,22 @@ namespace BeeNetServer.Controllers
     {
         private readonly BeeNetContext _context;
         private readonly IMapper _mapper;
+        private readonly IConfiguration _configuration;
+        private readonly IMemoryCache _memoryCache;
 
-        public PicturesController(BeeNetContext context, IMapper mapper)
+        public PicturesController(BeeNetContext context, IMapper mapper, IConfiguration configuration,IMemoryCache memoryCache)
         {
             _context = context;
             _mapper = mapper;
+            _configuration = configuration;
+            _memoryCache = memoryCache;
         }
 
         // GET: api/Pictures
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PictureGetResponse>>> GetPictures([FromQuery] PictureGetsParamter paramters)
         {
-            var picturesQuery = _context.Pictures.AsQueryable();
+            var picturesQuery = _context.Pictures.AsNoTracking();
             if (paramters.IsOrderByAddTimeDesc)
                 picturesQuery.OrderByDescending(p => p.CreatedTime);
             else
@@ -50,6 +56,7 @@ namespace BeeNetServer.Controllers
         public async Task<ActionResult<PictureGetResponse>> GetPicture(uint id)
         {
             var picture = await _context.Pictures
+                .AsNoTracking()
                 .ProjectTo<PictureGetResponse>(_mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync(p => p.Id == id);
             //var picture = await _context.Pictures.FindAsync(id);
@@ -68,14 +75,11 @@ namespace BeeNetServer.Controllers
         [HttpPost]
         public async Task<ActionResult<Picture>> PostPicture(PicturePostParameters parameters)
         {
-            if (picturePostParamters?.Count == 0)
+            if (parameters==null|| (parameters.ImageFiles==null&&parameters.Paths==null))
             {
                 return BadRequest();
             }
-            var pictures = _mapper.Map<List<Picture>>(picturePostParamters);
-            PicturesAddProgress.CreateTask(pictures);
-            //_context.Pictures.AddRange(pictures);
-            //await _context.SaveChangesAsync();
+            PicturesAddProgress.CreateTask(parameters, _configuration);
             return new AcceptedResult();
         }
 
@@ -91,7 +95,11 @@ namespace BeeNetServer.Controllers
 
             _context.Pictures.Remove(picture);
             await _context.SaveChangesAsync();
-            System.IO.File.Delete(picture.Path);
+            var picturePath = _configuration["ServerSettings:PictureStorePath"] + "/" + picture.Path;
+            System.IO.File.Delete(picturePath);
+            if (Directory.GetFiles(picturePath).Length == 0)
+                System.IO.File.Delete(Path.GetDirectoryName(picturePath));
+
             return Ok();
         }
     }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AutoMapper.Configuration.Conventions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -39,22 +40,15 @@ namespace BeeNetServer.Background
             CurrentValue = value;
             Information = text;
         }
+        public AddPicturesProgressIndicator(int capacity)
+        {
+            PictureResults = Enumerable.Repeat(new AddPicturesProgressResult(), capacity).ToList();
+        }
     }
     public enum AddPicturesProgressStatus
     {
         Running,
         Finished,
     }
-    public class AddPicturesProgressResult
-    {
-        public AddPicturesProgressResultStatusEnum Result { get; set; }
-        public int ConflictPictureId { get; set; }
-    }
-    public enum AddPicturesProgressResultStatusEnum
-    {
-        Pending,
-        Processing,
-        Done,
-        Conflict
-    }
+
 }

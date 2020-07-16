@@ -11,51 +11,12 @@ namespace BeeNetServer
     {
         public class CPictureSettings
         {
-            private string _pictureStorePath = Path.Join("wwwroot", "pictures");
-            private string _screenShotStorePath = Path.Join("wwwroot", "screenShots");
-            /// <summary>
-            /// 启动相似判断
-            /// </summary>
-            public bool UseSimilarJudge { get; set; } = true;
             /// <summary>
             /// 相似判断阀值
             /// </summary>
             public float SimilarThreshold { get; set; } = 0.95f;
-
-            /// <summary>
-            /// 图片库的位置
-            /// </summary>
-            public string PictureStorePath
-            {
-                get => _pictureStorePath;
-                set
-                {
-                    CreateDirectory(value);
-                    _pictureStorePath = value;
-                }
-            }
-            public string ScreenShotPath
-            {
-                get => _pictureStorePath;
-                set
-                {
-                    CreateDirectory(value);
-                    _pictureStorePath = value;
-                }
-            }
-
-            private static void CreateDirectory(string value)
-            {
-                if (!Directory.Exists(value))
-                {
-                    Directory.CreateDirectory(value);
-                }
-            }
-            //public bool AutoAddFileNameAsLabel
-            public CPictureSettings()
-            {
-                CreateDirectory(_pictureStorePath);
-            }
+            public string BufferFilePath { get; set; }
+            public int BufferFileSize { get; set; }
         }
         public class CRequestSettings
         {

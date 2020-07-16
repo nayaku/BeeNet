@@ -106,6 +106,15 @@ namespace BeeNetServer.Resources {
         }
         
         /// <summary>
+        ///   查找类似 准备执行。 的本地化字符串。
+        /// </summary>
+        internal static string ReadyToRun {
+            get {
+                return ResourceManager.GetString("ReadyToRun", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 库中已经存在相同图片。 的本地化字符串。
         /// </summary>
         internal static string SamePictureInGallery {

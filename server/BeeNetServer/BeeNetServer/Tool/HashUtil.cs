@@ -61,13 +61,13 @@ namespace BeeNetServer.Tool
 
         public static (int Width,int Height) GetSize(Stream stream)
         {
-            var bitmap=FreeImageBitmap.FromStream(stream);
+            using var bitmap=FreeImageBitmap.FromStream(stream);
             return (bitmap.Width, bitmap.Height);
         }
 
         public static string GetMD5(Stream stream)
         {
-            var hashAlgorithm = new MD5CryptoServiceProvider();
+            using var hashAlgorithm = new MD5CryptoServiceProvider();
             var md5Bytes=hashAlgorithm.ComputeHash(stream);
             hashAlgorithm.Clear();
             string md5 = BitConverter.ToString(md5Bytes);
