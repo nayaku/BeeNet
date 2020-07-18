@@ -2,14 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BeeNetServer.Data;
 using BeeNetServer.Models;
-using BeeNetServer.Parameters;
-using System.Linq.Dynamic.Core;
-using BeeNetServer.Dto;
 using AutoMapper;
 
 namespace BeeNetServer.Controllers

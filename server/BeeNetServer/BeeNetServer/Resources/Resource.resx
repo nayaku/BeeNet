@@ -120,17 +120,41 @@
   <data name="AddingPicture" xml:space="preserve">
     <value>正在添加图片{0}。</value>
   </data>
+  <data name="CreatingZipFile" xml:space="preserve">
+    <value>正在创建压缩包中……</value>
+  </data>
+  <data name="ExportingDatabase" xml:space="preserve">
+    <value>正在导出数据库……</value>
+  </data>
+  <data name="ExportingPicture" xml:space="preserve">
+    <value>正在导出图片{0}……</value>
+  </data>
   <data name="FileNotExist" xml:space="preserve">
     <value>文件不存在！</value>
   </data>
   <data name="IllegalOperateBecausePreviousNotFinish" xml:space="preserve">
     <value>非法操作！由于前一个操作未完成！</value>
   </data>
+  <data name="ImportingDatabase" xml:space="preserve">
+    <value>正在导入数据库中……</value>
+  </data>
+  <data name="ImportingLabel" xml:space="preserve">
+    <value>正在导入标签{0}……</value>
+  </data>
+  <data name="ImportingPicture" xml:space="preserve">
+    <value>正在导入第{0}张图片……</value>
+  </data>
   <data name="NotFindPictureInQueue" xml:space="preserve">
     <value>在队列中找不到指定图片，请刷新页面后重试！</value>
   </data>
   <data name="OperateFinish" xml:space="preserve">
     <value>操作完成。</value>
+  </data>
+  <data name="ReadingDatabaseFile" xml:space="preserve">
+    <value>正在读取数据库转存文件中……</value>
+  </data>
+  <data name="ReadingZipFile" xml:space="preserve">
+    <value>正在读取压缩文件中……</value>
   </data>
   <data name="ReadyToRun" xml:space="preserve">
     <value>准备执行。</value>
@@ -144,7 +168,16 @@
   <data name="SavingDatabaseChange" xml:space="preserve">
     <value>正在保存到数据库中……</value>
   </data>
+  <data name="SavingLabelDatabaseChange" xml:space="preserve">
+    <value>正在保存标签数据库的更改……</value>
+  </data>
+  <data name="SavingPictureDatabaseChange" xml:space="preserve">
+    <value>正在保存图片数据库的更改……</value>
+  </data>
   <data name="SimilarPicture" xml:space="preserve">
     <value>已经存在相似图片。</value>
+  </data>
+  <data name="WritingDatabaseFile" xml:space="preserve">
+    <value>正在写入数据库转存文件中……</value>
   </data>
 </root>

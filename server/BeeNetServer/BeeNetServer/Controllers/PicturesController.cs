@@ -14,6 +14,7 @@ using BeeNetServer.Parameters.Picture;
 using Microsoft.Extensions.Configuration;
 using System.IO;
 using Microsoft.Extensions.Caching.Memory;
+using BeeNetServer.Background.AddPicture;
 
 namespace BeeNetServer.Controllers
 {

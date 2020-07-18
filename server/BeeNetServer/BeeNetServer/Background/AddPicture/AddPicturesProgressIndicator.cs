@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BeeNetServer.Background
+namespace BeeNetServer.Background.AddPicture
 {
 
     /// <summary>
@@ -23,13 +23,9 @@ namespace BeeNetServer.Background
         /// <summary>
         /// 当前步骤状态
         /// </summary>
-        public AddPicturesProgressStatus TaskProgressStatus { get; set; }
+        public TaskProgressEnum TaskProgressStatus { get; set; }
         public List<AddPicturesProgressResult> PictureResults { get; set; }
-        /// <summary>
-        /// 是否繁忙
-        /// </summary>
-        /// <returns></returns>
-        public bool IsBusy => TaskProgressStatus == AddPicturesProgressStatus.Running;
+
         /// <summary>
         /// 设置进度
         /// </summary>
@@ -44,11 +40,6 @@ namespace BeeNetServer.Background
         {
             PictureResults = Enumerable.Repeat(new AddPicturesProgressResult(), capacity).ToList();
         }
-    }
-    public enum AddPicturesProgressStatus
-    {
-        Running,
-        Finished,
     }
 
 }

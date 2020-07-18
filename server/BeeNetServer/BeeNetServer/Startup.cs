@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Debug;
 using Microsoft.OpenApi.Models;
 using System.IO;
+using System.Text.Json.Serialization;
 
 namespace BeeNetServer
 {
@@ -31,7 +32,10 @@ namespace BeeNetServer
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            services.AddControllers().AddJsonOptions(opts =>
+            {
+                opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            });
             services.AddDbContext<BeeNetContext>(options =>
                 options.UseLoggerFactory(MyLoggerFactory).UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
 
@@ -42,7 +46,7 @@ namespace BeeNetServer
             });
 
             services.AddAutoMapper(typeof (Startup));
-            services.AddMemoryCache()
+            services.AddMemoryCache();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

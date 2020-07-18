@@ -70,6 +70,33 @@ namespace BeeNetServer.Resources {
         }
         
         /// <summary>
+        ///   查找类似 正在创建压缩包中…… 的本地化字符串。
+        /// </summary>
+        internal static string CreatingZipFile {
+            get {
+                return ResourceManager.GetString("CreatingZipFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 正在导出数据库…… 的本地化字符串。
+        /// </summary>
+        internal static string ExportingDatabase {
+            get {
+                return ResourceManager.GetString("ExportingDatabase", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 正在导出图片{0}…… 的本地化字符串。
+        /// </summary>
+        internal static string ExportingPicture {
+            get {
+                return ResourceManager.GetString("ExportingPicture", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 文件不存在！ 的本地化字符串。
         /// </summary>
         internal static string FileNotExist {
@@ -88,6 +115,33 @@ namespace BeeNetServer.Resources {
         }
         
         /// <summary>
+        ///   查找类似 正在导入数据库中…… 的本地化字符串。
+        /// </summary>
+        internal static string ImportingDatabase {
+            get {
+                return ResourceManager.GetString("ImportingDatabase", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 正在导入标签{0}…… 的本地化字符串。
+        /// </summary>
+        internal static string ImportingLabel {
+            get {
+                return ResourceManager.GetString("ImportingLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 正在导入第{0}张图片…… 的本地化字符串。
+        /// </summary>
+        internal static string ImportingPicture {
+            get {
+                return ResourceManager.GetString("ImportingPicture", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 在队列中找不到指定图片，请刷新页面后重试！ 的本地化字符串。
         /// </summary>
         internal static string NotFindPictureInQueue {
@@ -102,6 +156,24 @@ namespace BeeNetServer.Resources {
         internal static string OperateFinish {
             get {
                 return ResourceManager.GetString("OperateFinish", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 正在读取数据库转存文件中…… 的本地化字符串。
+        /// </summary>
+        internal static string ReadingDatabaseFile {
+            get {
+                return ResourceManager.GetString("ReadingDatabaseFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 正在读取压缩文件中…… 的本地化字符串。
+        /// </summary>
+        internal static string ReadingZipFile {
+            get {
+                return ResourceManager.GetString("ReadingZipFile", resourceCulture);
             }
         }
         
@@ -142,11 +214,38 @@ namespace BeeNetServer.Resources {
         }
         
         /// <summary>
+        ///   查找类似 正在保存标签数据库的更改…… 的本地化字符串。
+        /// </summary>
+        internal static string SavingLabelDatabaseChange {
+            get {
+                return ResourceManager.GetString("SavingLabelDatabaseChange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 正在保存图片数据库的更改…… 的本地化字符串。
+        /// </summary>
+        internal static string SavingPictureDatabaseChange {
+            get {
+                return ResourceManager.GetString("SavingPictureDatabaseChange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 已经存在相似图片。 的本地化字符串。
         /// </summary>
         internal static string SimilarPicture {
             get {
                 return ResourceManager.GetString("SimilarPicture", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 正在写入数据库转存文件中…… 的本地化字符串。
+        /// </summary>
+        internal static string WritingDatabaseFile {
+            get {
+                return ResourceManager.GetString("WritingDatabaseFile", resourceCulture);
             }
         }
     }

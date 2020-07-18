@@ -1,21 +1,19 @@
-﻿using BeeNetServer.CException;
-using BeeNetServer.Data;
+﻿using BeeNetServer.Data;
 using BeeNetServer.Models;
 using BeeNetServer.Parameters.Picture;
 using BeeNetServer.Resources;
 using BeeNetServer.Tool;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BeeNetServer.Background
+namespace BeeNetServer.Background.AddPicture
 {
     /// <summary>
     /// 添加图片线程类
@@ -102,7 +100,6 @@ namespace BeeNetServer.Background
             // 是否为本地添加
             var isFromLocal = _picturePostParameters.Paths != null;
             var len = _picturePostParameters.ImageFiles != null ? _picturePostParameters.ImageFiles.Count : _picturePostParameters.Paths.Count;
-            var pictures = new List<Picture>(len);
             var md5Set = new HashSet<string>(len);
             // 遍历列表
             for (var index = 0; index < len; index++)
@@ -140,21 +137,12 @@ namespace BeeNetServer.Background
                 else
                 {
                     progressResult.Result = AddPicturesProgressResultStatusEnum.Done;
-                    progressResult.Id = picture.Id;
-                    progressResult.Path = picture.Path;
-                    progressResult.Height = picture.Height;
-                    progressResult.Width = progressResult.Width;
                 }
             }
             TaskProgress.SetProgress(0.99f, Resource.SavingDatabaseChange);
             context.SaveChanges();
-            for(var index=0;index<len;index++)
-            {
-                if(pictures[index]!=null)
-                    TaskProgress.PictureResults[index].Id = pictures[index].Id;
-            }
             TaskProgress.SetProgress(1.0f, Resource.OperateFinish);
-            TaskProgress.TaskProgressStatus = AddPicturesProgressStatus.Finished;
+            TaskProgress.TaskProgressStatus = TaskProgressEnum.Finish;
         }
 
     }
