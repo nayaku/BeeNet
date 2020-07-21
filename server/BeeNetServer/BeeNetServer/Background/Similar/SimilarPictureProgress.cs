@@ -12,14 +12,20 @@ using System.Threading.Tasks;
 
 namespace BeeNetServer.Background.Similar
 {
-    public class SimilarPictureProgress
+    public static class SimilarPictureProgress
     {
         public static SimilarPictureProgressIndicator TaskProgress { get; set; }
+
+        public static bool IsBusy => TaskProgress.TaskProgressStatus != null && TaskProgress.TaskProgressStatus == TaskProgressEnum.Running;
 
         private static IMapper _mapper;
 
         private static Task _workTask;
 
+        /// <summary>
+        /// 创建任务
+        /// </summary>
+        /// <param name="mapper"></param>
         public static void CreateTask(IMapper mapper)
         {
             _mapper = mapper;

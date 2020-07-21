@@ -7,12 +7,15 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BeeNetServer.Data;
 using BeeNetServer.Models;
-using AutoMapper.QueryableExtensions;
-using AutoMapper;
 using BeeNetServer.Parameters;
 using System.IO;
 using System.Drawing;
 using System.Windows.Media.Imaging;
+using BeeNetServer.Response.ScreenShot;
+using BeeNetServer.Parameters.ScreenShot;
+using AutoMapper;
+using Microsoft.Extensions.Configuration;
+using AutoMapper.QueryableExtensions;
 
 namespace BeeNetServer.Controllers
 {
@@ -22,19 +25,21 @@ namespace BeeNetServer.Controllers
     {
         private readonly BeeNetContext _context;
         private readonly IMapper _mapper;
+        private readonly IConfiguration _configuration;
 
-        public ScreenShotsController(BeeNetContext context,IMapper mapper)
+        public ScreenShotsController(BeeNetContext context,IMapper mapper, IConfiguration configuration)
         {
             _context = context;
             _mapper = mapper;
+            _configuration = configuration;
         }
 
         // GET: api/ScreenShots/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<PictureBase>> GetScreenShot(uint id)
+        public async Task<ActionResult<ScreenShotGetResponse>> GetScreenShot(uint id)
         {
             var screenShot = await  _context.ScreenShots
-                .ProjectTo<PictureBase>(_mapper.ConfigurationProvider)
+                .ProjectTo<ScreenShotGetResponse>(_mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync(p=> p.Id == id);
 
             if (screenShot == null)
@@ -49,7 +54,7 @@ namespace BeeNetServer.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
-        public async Task<ActionResult<ScreenShot>> PostScreenShot(ScreenShotPostParamters paramters)
+        public async Task<ActionResult<ScreenShot>> PostScreenShot(ScreenShotPostParamter paramters)
         {
             var screenShot = new ScreenShot
             {
@@ -57,7 +62,7 @@ namespace BeeNetServer.Controllers
             };
 
             // 文件路径
-            var dirPathString = UserSettingReader.UserSettings.PictureSettings.ScreenShotPath;
+            var dirPathString = _configuration["ServerSettings:PictureStorePath"];
             while (true)
             {
                 var filePathString = Path.Combine(dirPathString, Path.GetTempPath() + paramters.Ext);

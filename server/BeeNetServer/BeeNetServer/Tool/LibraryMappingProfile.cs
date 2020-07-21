@@ -2,8 +2,10 @@
 using BeeNetServer.Background;
 using BeeNetServer.Background.PictureStore;
 using BeeNetServer.Models;
+using BeeNetServer.Parameters.Label;
 using BeeNetServer.Response.Label;
 using BeeNetServer.Response.Picture;
+using BeeNetServer.Response.ScreenShot;
 using System.Linq;
 
 namespace BeeNetServer.Tool
@@ -24,6 +26,9 @@ namespace BeeNetServer.Tool
             CreateMap<Label, PictureStoreLabel>();
             CreateMap<PictureStorePicture, PictureStoreImportProgressPictureResult>();
             CreateMap<PictureStorePicture, Picture>();
+
+            CreateMap<LabelPostPutParamter, Label>();
+            CreateMap<ScreenShot, ScreenShotGetResponse>();
         }
     }
 }

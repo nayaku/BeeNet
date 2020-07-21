@@ -7,6 +7,9 @@ using Microsoft.EntityFrameworkCore;
 using BeeNetServer.Data;
 using BeeNetServer.Models;
 using AutoMapper;
+using BeeNetServer.Parameters.Label;
+using BeeNetServer.Response.Label;
+using AutoMapper.QueryableExtensions;
 
 namespace BeeNetServer.Controllers
 {
@@ -25,22 +28,24 @@ namespace BeeNetServer.Controllers
 
         // GET: api/Labels
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Label>>> GetLabels([FromQuery]LabelsResourceParamters paramters)
+        public async Task<ActionResult<IEnumerable<LabelGetResponse>>> GetLabels([FromQuery] LabelGetsParamter paramters)
         {
+
             var labelsQuery = _context.Labels.AsQueryable();
-            if(!string.IsNullOrWhiteSpace(paramters.SearchKey))
+            if (!string.IsNullOrWhiteSpace(paramters.Name))
             {
-                labelsQuery.Where(l => l.Name.Contains(paramters.SearchKey));
+                labelsQuery.Where(l => l.Name.Contains(paramters.Name));
             }
-            labelsQuery.OrderBy(paramters.OrderBy);
-            labelsQuery.Skip((paramters.PageNumber - 1) * paramters.PageSize)
+            labelsQuery = labelsQuery.OrderByDescending(l => l.Num)
+                .Skip((paramters.PageNumber - 1) * paramters.PageSize)
                 .Take(paramters.PageSize);
-            return await labelsQuery.ToListAsync();
+            return await labelsQuery.ProjectTo<LabelGetResponse>(_mapper.ConfigurationProvider).ToListAsync();
+
         }
 
         // GET: api/Labels/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Label>> GetLabel(string name)
+        [HttpGet("{name}")]
+        public async Task<ActionResult<LabelGetResponse>> GetLabel(string name)
         {
             var label = await _context.Labels.FindAsync(name);
 
@@ -48,40 +53,14 @@ namespace BeeNetServer.Controllers
             {
                 return NotFound();
             }
-
-            return label;
-        }
-
-        [HttpPut]
-        public async Task<ActionResult<Label>> PutLabel(LabelDto labelDto)
-        {               
-            var label = _mapper.Map<Label>(labelDto);
-            label.ModifiedTime = DateTime.Now;
-            _context.Entry(label).State = EntityState.Modified;
-            _context.Entry(label).Property(l => l.CreatedTime).IsModified = false;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!LabelExists(label.Name))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-            return CreatedAtAction("GetLabel", new { id = label.Name }, label);
+            var labelResponse = _mapper.Map<LabelGetResponse>(label);
+            return labelResponse;
         }
 
         [HttpPost]
-        public async Task<ActionResult<Label>> PostLabel(LabelDto labelDto)
+        public async Task<ActionResult<Label>> PostLabel([FromBody] LabelPostPutParamter paramter)
         {
-            var label = _mapper.Map<Label>(labelDto);
+            var label = _mapper.Map<Label>(paramter);
             _context.Labels.Add(label);
             try
             {
@@ -99,6 +78,31 @@ namespace BeeNetServer.Controllers
                 }
             }
 
+            return CreatedAtAction("GetLabel", new { id = label.Name }, label);
+        }
+
+        [HttpPut]
+        public async Task<ActionResult<Label>> PutLabel([FromBody] LabelPostPutParamter paramter)
+        {
+            var label = _mapper.Map<Label>(paramter);
+            _context.Entry(label).State = EntityState.Modified;
+            _context.Entry(label).Property(l => l.Num).IsModified = false;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!LabelExists(label.Name))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
             return CreatedAtAction("GetLabel", new { id = label.Name }, label);
         }
 
