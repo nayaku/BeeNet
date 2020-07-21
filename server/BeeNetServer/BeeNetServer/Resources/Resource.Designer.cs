@@ -70,6 +70,15 @@ namespace BeeNetServer.Resources {
         }
         
         /// <summary>
+        ///   查找类似 正在计算第{0}张图片特征值中……\n共有{1}张图片待填入特征值…… 的本地化字符串。
+        /// </summary>
+        internal static string ComputingPictureEigenvalue {
+            get {
+                return ResourceManager.GetString("ComputingPictureEigenvalue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 正在创建压缩包中…… 的本地化字符串。
         /// </summary>
         internal static string CreatingZipFile {
@@ -160,6 +169,15 @@ namespace BeeNetServer.Resources {
         }
         
         /// <summary>
+        ///   查找类似 正在处理第{0}张图片……\n一共有{0}张图片。 的本地化字符串。
+        /// </summary>
+        internal static string ProcessingPicture {
+            get {
+                return ResourceManager.GetString("ProcessingPicture", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 正在读取数据库转存文件中…… 的本地化字符串。
         /// </summary>
         internal static string ReadingDatabaseFile {
@@ -228,6 +246,15 @@ namespace BeeNetServer.Resources {
         internal static string SavingPictureDatabaseChange {
             get {
                 return ResourceManager.GetString("SavingPictureDatabaseChange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 正在保存图片特征值到数据库 的本地化字符串。
+        /// </summary>
+        internal static string SavingPictureEigenvalueToDatabase {
+            get {
+                return ResourceManager.GetString("SavingPictureEigenvalueToDatabase", resourceCulture);
             }
         }
         

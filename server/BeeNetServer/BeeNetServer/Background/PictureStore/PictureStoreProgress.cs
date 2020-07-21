@@ -28,6 +28,10 @@ namespace BeeNetServer.Background.PictureStore
         /// 创建导出工作任务
         /// </summary>
         private static Task _workTask;
+
+        public static bool IsBusy => 
+            (ExportTaskProgress != null && ExportTaskProgress.TaskProgressStatus == TaskProgressEnum.Running) ||
+            (ImportTaskProgress != null && ImportTaskProgress.TaskProgressStatus == TaskProgressEnum.Running);
         public static void CreateExportTask(IMapper mapper, IConfiguration configuration)
         {
             _mapper = mapper;
@@ -45,7 +49,7 @@ namespace BeeNetServer.Background.PictureStore
         /// </summary>
         /// <param name="mapper"></param>
         /// <param name="configuration"></param>
-        public static void CreateImporTask(IMapper mapper, IConfiguration configuration,IFormFile formFile)
+        public static void CreateImportTask(IMapper mapper, IConfiguration configuration, IFormFile formFile)
         {
             _mapper = mapper;
             _configuration = configuration;
@@ -93,7 +97,7 @@ namespace BeeNetServer.Background.PictureStore
             for (var i = 0; i < pictureStoreJson.Pictures.Count; i++)
             {
                 var picture = pictureStoreJson.Pictures[i];
-                ExportTaskProgress.SetProgress(0.8f * i / pictureStoreJson.Pictures.Count + 0.2f, 
+                ExportTaskProgress.SetProgress(0.8f * i / pictureStoreJson.Pictures.Count + 0.2f,
                     string.Format(Resource.ExportingPicture, Path.GetFileNameWithoutExtension(picture.Path)));
                 var path = "wwwroot/" + picture.Path;
                 archive.CreateEntryFromFile(path, picture.Path);
@@ -116,7 +120,7 @@ namespace BeeNetServer.Background.PictureStore
 
             // 读取压缩包
             ImportTaskProgress.SetProgress(0.05f, Resource.ReadingZipFile);
-            using var archive = new ZipArchive(_formFile.OpenReadStream(),ZipArchiveMode.Read);
+            using var archive = new ZipArchive(_formFile.OpenReadStream(), ZipArchiveMode.Read);
 
             // 读取数据库
             ImportTaskProgress.SetProgress(0.1f, Resource.ReadingDatabaseFile);
@@ -126,21 +130,21 @@ namespace BeeNetServer.Background.PictureStore
             entryStream.Read(data);
             entryStream.Dispose();
             var jsonReader = new Utf8JsonReader(data);
-            
+
             PictureStoreJson pictureStoreJson = (PictureStoreJson)JsonSerializer.Deserialize(ref jsonReader, typeof(PictureStoreJson));
 
             ImportTaskProgress.LabelResults = Enumerable.Repeat(new ResultStatusEnum(), pictureStoreJson.Labels.Count).ToList();
             ImportTaskProgress.PictureResults = Enumerable.Repeat(new PictureStoreImportProgressPictureResult(), pictureStoreJson.Pictures.Count).ToList();
 
             // 写入标签数据
-            for(var i =0;i<pictureStoreJson.Labels.Count;i++)
+            for (var i = 0; i < pictureStoreJson.Labels.Count; i++)
             {
-                var storeLabel= pictureStoreJson.Labels[i];
-                ImportTaskProgress.SetProgress(0.38f*i/pictureStoreJson.Labels.Count+ 0.2f, string.Format(Resource.ImportingLabel,storeLabel.Name));
+                var storeLabel = pictureStoreJson.Labels[i];
+                ImportTaskProgress.SetProgress(0.38f * i / pictureStoreJson.Labels.Count + 0.2f, string.Format(Resource.ImportingLabel, storeLabel.Name));
                 ImportTaskProgress.LabelResults[i] = ResultStatusEnum.Processing;
                 var label = context.Labels.Find(storeLabel.Name);
                 // 标签存在，则更新
-                if (label!=null)
+                if (label != null)
                 {
                     if (label.Color != storeLabel.Color)
                     {
@@ -167,16 +171,16 @@ namespace BeeNetServer.Background.PictureStore
             context.SaveChanges();
 
             // 写入图片数据
-            for (var i=0;i<pictureStoreJson.Pictures.Count;i++)
+            for (var i = 0; i < pictureStoreJson.Pictures.Count; i++)
             {
-                var storePicture= pictureStoreJson.Pictures[i];
-                ImportTaskProgress.SetProgress(0.45f * i / pictureStoreJson.Pictures.Count + 0.5f, 
-                    string.Format(Resource.ImportingPicture,i));
+                var storePicture = pictureStoreJson.Pictures[i];
+                ImportTaskProgress.SetProgress(0.45f * i / pictureStoreJson.Pictures.Count + 0.5f,
+                    string.Format(Resource.ImportingPicture, i));
                 var pictureResult = ImportTaskProgress.PictureResults[i];
                 pictureResult.Result = ResultStatusEnum.Processing;
                 var conflictPictureId = context.Pictures.Where(p => p.MD5 == storePicture.MD5).Select(p => p.Id).FirstOrDefault();
-                
-                if (conflictPictureId!=0)
+
+                if (conflictPictureId != 0)
                 {
                     pictureResult.Result = ResultStatusEnum.Conflict;
                     pictureResult.ConflictPictureId = conflictPictureId;
@@ -194,7 +198,7 @@ namespace BeeNetServer.Background.PictureStore
                         Picture = picture,
                         LabelName = ln
                     }).ToList();
-                    
+
                     context.Pictures.Add(picture);
                     pictureResult.Result = ResultStatusEnum.Done;
                 }

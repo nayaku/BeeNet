@@ -120,6 +120,9 @@
   <data name="AddingPicture" xml:space="preserve">
     <value>正在添加图片{0}。</value>
   </data>
+  <data name="ComputingPictureEigenvalue" xml:space="preserve">
+    <value>正在计算第{0}张图片特征值中……\n共有{1}张图片待填入特征值……</value>
+  </data>
   <data name="CreatingZipFile" xml:space="preserve">
     <value>正在创建压缩包中……</value>
   </data>
@@ -150,6 +153,9 @@
   <data name="OperateFinish" xml:space="preserve">
     <value>操作完成。</value>
   </data>
+  <data name="ProcessingPicture" xml:space="preserve">
+    <value>正在处理第{0}张图片……\n一共有{0}张图片。</value>
+  </data>
   <data name="ReadingDatabaseFile" xml:space="preserve">
     <value>正在读取数据库转存文件中……</value>
   </data>
@@ -173,6 +179,9 @@
   </data>
   <data name="SavingPictureDatabaseChange" xml:space="preserve">
     <value>正在保存图片数据库的更改……</value>
+  </data>
+  <data name="SavingPictureEigenvalueToDatabase" xml:space="preserve">
+    <value>正在保存图片特征值到数据库</value>
   </data>
   <data name="SimilarPicture" xml:space="preserve">
     <value>已经存在相似图片。</value>

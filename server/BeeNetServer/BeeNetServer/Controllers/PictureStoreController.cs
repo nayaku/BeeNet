@@ -2,7 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using BeeNetServer.Background.PictureStore;
+using BeeNetServer.Data;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -12,36 +17,35 @@ namespace BeeNetServer.Controllers
     [ApiController]
     public class PictureStoreController : ControllerBase
     {
-        // GET: api/<PictureStoreController>
-        [HttpGet]
-        public IEnumerable<string> Get()
+        private readonly BeeNetContext _context;
+        private readonly IMapper _mapper;
+        private readonly IConfiguration _configuration;
+
+        public PictureStoreController(BeeNetContext context, IMapper mapper, IConfiguration configuration)
         {
-            return new string[] { "value1", "value2" };
+            _context = context;
+            _mapper = mapper;
+            _configuration = configuration;
         }
 
-        // GET api/<PictureStoreController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        // GET: api/<PictureStoreController>
+        [HttpGet]
+        public async Task<ActionResult> Get()
         {
-            return "value";
+            if (PictureStoreProgress.IsBusy)
+                return BadRequest();
+            PictureStoreProgress.CreateExportTask(_mapper, _configuration);
+            return Accepted();
         }
 
         // POST api/<PictureStoreController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<ActionResult> Post([FromBody] IFormFile Store)
         {
-        }
-
-        // PUT api/<PictureStoreController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE api/<PictureStoreController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
+            if (PictureStoreProgress.IsBusy)
+                return BadRequest();
+            PictureStoreProgress.CreateImportTask(_mapper, _configuration, Store);
+            return Accepted();
         }
     }
 }

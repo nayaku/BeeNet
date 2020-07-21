@@ -74,7 +74,7 @@ namespace BeeNetServer.Controllers
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPost]
-        public async Task<ActionResult<Picture>> PostPicture(PicturePostParameters parameters)
+        public async Task<ActionResult> PostPicture(PicturePostParameters parameters)
         {
             if (parameters==null|| (parameters.ImageFiles==null&&parameters.Paths==null))
             {

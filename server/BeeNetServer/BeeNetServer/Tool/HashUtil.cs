@@ -86,6 +86,17 @@ namespace BeeNetServer.Tool
             return ImagePhash.GetCrossCorrelation(hash1, hash2)> UserSettingReader.UserSettings.PictureSettings.SimilarThreshold;
         }
 
+        /// <summary>
+        /// 获取图片priHash数值
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        public static byte[] GetPriHash(Stream stream)
+        {
+            var bitmapSource = BitmapFrame.Create(stream);
+            var priHash = ImagePhash.ComputeDigest(bitmapSource.ToLuminanceImage()).Coefficients;
+            return priHash;
+        }
         //public static Size GetPictureSize(string path)
         //{
         //    using var stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read);
@@ -94,30 +105,30 @@ namespace BeeNetServer.Tool
 
         //}
 
-        /// <summary>
-        /// 完善图片信息（包括尺寸、MD5、特征值）
-        /// </summary>
-        /// <param name="picture"></param>
-        public static void ComplementPicture(Picture picture,Stream stream)
-        {
-            var bitmapSource = BitmapFrame.Create(stream);
-            picture.Width = bitmapSource.PixelWidth;
-            picture.Height = bitmapSource.PixelHeight;
-            using var md5Hash = MD5.Create();
-            var imageBitArray = bitmapSource.ToByteImage().Array;
-            var md5Data = md5Hash.ComputeHash(imageBitArray);
-            var md5String = BitConverter.ToString(md5Data).Replace("-", ""); ;
-            picture.MD5 = md5String;
-            if (UserSettingReader.UserSettings.PictureSettings.UseSimilarJudge)
-            {
-                var priHash = ImagePhash.ComputeDigest(bitmapSource.ToLuminanceImage()).Coefficients;
-                picture.PriHash = priHash;
-            }
-            else
-            {
-                picture.PriHash = null;
-            }
-        }
+        ///// <summary>
+        ///// 完善图片信息（包括尺寸、MD5、特征值）
+        ///// </summary>
+        ///// <param name="picture"></param>
+        //public static void ComplementPicture(Picture picture,Stream stream)
+        //{
+        //    var bitmapSource = BitmapFrame.Create(stream);
+        //    picture.Width = bitmapSource.PixelWidth;
+        //    picture.Height = bitmapSource.PixelHeight;
+        //    using var md5Hash = MD5.Create();
+        //    var imageBitArray = bitmapSource.ToByteImage().Array;
+        //    var md5Data = md5Hash.ComputeHash(imageBitArray);
+        //    var md5String = BitConverter.ToString(md5Data).Replace("-", ""); ;
+        //    picture.MD5 = md5String;
+        //    if (UserSettingReader.UserSettings.PictureSettings.UseSimilarJudge)
+        //    {
+        //        var priHash = ImagePhash.ComputeDigest(bitmapSource.ToLuminanceImage()).Coefficients;
+        //        picture.PriHash = priHash;
+        //    }
+        //    else
+        //    {
+        //        picture.PriHash = null;
+        //    }
+        //}
         //public static void Main(string[] args)
         //{
         //    System.Diagnostics.Debug.WriteLine("hello");
